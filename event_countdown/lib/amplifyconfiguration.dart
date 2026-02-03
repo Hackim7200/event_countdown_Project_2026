@@ -2,43 +2,56 @@ const String amplifyconfig = '''
 {
   "version": "1",
   "auth": {
-    "aws_region": "eu-west-2",
-    "user_pool_id": "eu-west-2_PxKswmVes",
-    "user_pool_client_id": "3nh7db1iv0u984uev4b8u3djkc",
-    "identity_pool_id": "eu-west-2:ecd9ef99-3ced-49f4-b5fd-da40ae2c57bb",
-    "username_attributes": [],
-    "standard_required_attributes": [
-      "email"
-    ],
-    "password_policy": {
-      "min_length": 8,
-      "require_lowercase": true,
-      "require_uppercase": true,
-      "require_numbers": true,
-      "require_symbols": false
+    "plugins": {
+      "awsCognitoAuthPlugin": {
+        "UserAgent": "aws-amplify-cli/0.1.0",
+        "Version": "0.1.0",
+        "IdentityManager": {
+          "Default": {}
+        },
+        "CredentialsProvider": {
+          "CognitoIdentity": {
+            "Default": {
+              "PoolId": "eu-west-2:92c25dec-d765-4bc1-a21a-1e144ddfa755",
+              "Region": "eu-west-2"
+            }
+          }
+        },
+        "CognitoUserPool": {
+          "Default": {
+            "PoolId": "eu-west-2_gCBULy3Py",
+            "AppClientId": "7e0deiftagubqp5o8utrj9jhn2",
+            "Region": "eu-west-2"
+          }
+        },
+        "Auth": {
+          "Default": {
+            "authenticationFlowType": "USER_SRP_AUTH",
+            "usernameAttributes": [],
+            "signupAttributes": ["EMAIL"],
+            "passwordProtectionSettings": {
+              "passwordPolicyMinLength": 8,
+              "passwordPolicyCharacters": [
+                "REQUIRES_LOWERCASE",
+                "REQUIRES_UPPERCASE",
+                "REQUIRES_NUMBERS"
+              ]
+            }
+          }
+        }
+      }
     }
   },
-
-
-  
-  "custom": {
-    "api": {
-      "name": "SpacesApi",
-      "endpoint": "https://paet3fbabi.execute-api.eu-west-2.amazonaws.com/prod/",
-      "region": "eu-west-2",
-      "authorization_type": "AMAZON_COGNITO_USER_POOLS"
-    },
-
-
-    "data": {
-      "spaces_table_name": "MoviesTable-06beee1689e9",
-      "spaces_table_arn": "arn:aws:dynamodb:eu-west-2:759135634975:table/MoviesTable-06beee1689e9"
-    },
-
-
-    "lambda": {
-      "reservation_lambda_arn": "arn:aws:lambda:eu-west-2:759135634975:function:LambdaStack-ReservationLambda2785A78F-4uaLuCaThafs",
-      "movies_lambda_arn": "arn:aws:lambda:eu-west-2:759135634975:function:LambdaStack-MoviesLambda074129B0-kyMPaOVoJzsB"
+  "api": {
+    "plugins": {
+      "awsAPIPlugin": {
+        "CountdownApi": {
+          "endpointType": "REST",
+          "endpoint": "https://950tph40jc.execute-api.eu-west-2.amazonaws.com/prod",
+          "region": "eu-west-2",
+          "authorizationType": "AMAZON_COGNITO_USER_POOLS"
+        }
+      }
     }
   }
 }
