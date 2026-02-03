@@ -1,0 +1,21 @@
+{
+  "DataStack": {
+    "ExportsOutputFnGetAttMoviesTable0F76A3E4Arn14E1B863": "arn:aws:dynamodb:eu-west-2:759135634975:table/MoviesTable-06beee1689e9",
+    "ExportsOutputRefMoviesTable0F76A3E43EB7201A": "MoviesTable-06beee1689e9"
+  },
+  "AuthStack": {
+    "UserPoolId": "eu-west-2_PxKswmVes",
+    "MoviesIdentityPoolId": "eu-west-2:ecd9ef99-3ced-49f4-b5fd-da40ae2c57bb",
+    "ExportsOutputFnGetAttMoviesUserPoolF2117139ArnEE485BA2": "arn:aws:cognito-idp:eu-west-2:759135634975:userpool/eu-west-2_PxKswmVes",
+    "MoviesUserPoolClientId": "3nh7db1iv0u984uev4b8u3djkc"
+  },
+  "UiDeploymentStack": {
+    "ExampleUrl": "d1gg6c3cii73go.cloudfront.net"
+  },
+  "LambdaStack": {
+    "ExportsOutputFnGetAttMoviesLambda074129B0Arn64911879": "arn:aws:lambda:eu-west-2:759135634975:function:LambdaStack-MoviesLambda074129B0-kyMPaOVoJzsB"
+  },
+  "ApiStack": {
+    "MoviesApiEndpoint64CEF732": "https://paet3fbabi.execute-api.eu-west-2.amazonaws.com/prod/"
+  }
+}
