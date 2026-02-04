@@ -3,6 +3,7 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/features/models/todo.dart';
+import 'package:event_countdown/features/todo/forms/add_todo.dart';
 import 'package:flutter/material.dart';
 
 class TodoScreen extends StatefulWidget {
@@ -63,32 +64,16 @@ class _TodoScreenState extends State<TodoScreen> {
   }
 
   Future<void> _addTodo() async {
-    try {
-      final token = await _getIdToken();
-      if (token == null) {
-        safePrint('User is not signed in');
-        return;
-      }
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AddTaskBottomSheet(),
+    );
 
-      final response = await Amplify.API
-          .post(
-            '/todos',
-            apiName: 'CountdownApi',
-            body: HttpPayload.json({
-              'title': 'New Todo',
-              'completed': false,
-              'createdAt': DateTime.now().toIso8601String(),
-            }),
-            headers: {'Authorization': token},
-          )
-          .response;
-
-      safePrint(
-        'Todo added (${response.statusCode}): ${response.decodeBody()}',
-      );
-      await _refreshTodos(); // Refresh the list after adding
-    } catch (e) {
-      safePrint('Failed to add todo: $e');
+    // If a task was added successfully, refresh the list
+    if (result == true) {
+      await _refreshTodos();
     }
   }
 
@@ -113,6 +98,7 @@ class _TodoScreenState extends State<TodoScreen> {
                       }
                     },
                   ),
+                  onLongPress: () {},
                 );
               },
             ),
