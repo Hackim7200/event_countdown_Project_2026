@@ -87,6 +87,65 @@ Generate code, corrections, and refactorings that comply with the basic principl
 - Write acceptance tests for each module.
   - Follow the Given-When-Then convention.
 
+## Code Readability and Documentation
+
+### Comments and Documentation
+
+- Write comments that explain **why**, not **what** the code does.
+  - The code itself should be self-explanatory for what it does.
+  - Comments should provide context, reasoning, or business logic explanation.
+- Add doc comments (///) for all public classes, methods, and functions.
+  - Include description of purpose, parameters, return values, and exceptions.
+  - Use proper Dart documentation format with @param, @returns, @throws tags.
+- Add inline comments for complex algorithms or non-obvious logic.
+- Comment on workarounds, hacks, or temporary solutions with TODO or FIXME.
+  - Include ticket numbers or references when applicable.
+- Keep comments up-to-date with code changes.
+- Remove commented-out code; use version control instead.
+
+### Code Readability
+
+- Use meaningful and descriptive names that reveal intent.
+  - Variable names should describe the data they hold.
+  - Function names should describe what they do.
+  - Class names should describe what they represent.
+- Keep line length reasonable (max 80-100 characters).
+- Use whitespace strategically to group related code.
+  - Separate logical sections with blank lines between functions and classes.
+  - Group related variable declarations together.
+- Extract magic numbers and strings into named constants with descriptive names.
+- Break complex conditions into well-named boolean variables.
+  - Example: `final bool isValidUser = user != null && user.isActive && user.hasPermission;`
+- Use early returns to reduce nesting and improve readability.
+- Prefer positive conditionals over negative ones when possible.
+  - Use `if (isValid)` instead of `if (!isInvalid)`.
+- Format code consistently using `dart format`.
+
+### Code Organization
+
+- Group related functionality together.
+- Order class members logically:
+  - Static constants
+  - Static variables
+  - Instance variables
+  - Constructors
+  - Public methods
+  - Private methods
+- Keep related files in the same directory.
+- Use barrel files (index files) to simplify imports.
+
+### Human-Friendly Patterns
+
+- Prefer readability over cleverness.
+  - Write code that junior developers can understand.
+  - Avoid overly complex one-liners.
+- Use descriptive parameter names in function declarations.
+- Favor explicit over implicit when it improves clarity.
+- Add newlines around return statements for emphasis.
+- Use trailing commas in multi-line parameter lists and collections.
+- Add explanatory comments before complex widget trees.
+- Document any non-standard patterns or architectural decisions.
+
 ## Specific to Flutter
 
 ### Basic Principles
@@ -120,6 +179,17 @@ Generate code, corrections, and refactorings that comply with the basic principl
 - Deeply nested widgets can make state management more challenging. By keeping the tree shallow, it becomes easier to manage state and pass data between widgets
 - Break down large widgets into smaller, focused widgets
 - Utilize const constructors wherever possible to reduce rebuilds
+
+### Flutter-Specific Readability
+
+- Add comments describing the purpose of each custom widget.
+- Use descriptive names for widget parameters.
+- Comment on why specific widget properties are set (not obvious values).
+- Document complex layout logic or calculations.
+- Add section comments in build methods to separate UI sections.
+  - Example: `// Header section`, `// Content area`, `// Footer actions`
+- Explain stateful widget lifecycle decisions.
+- Document platform-specific code with reasons.
 
 ### Testing
 
