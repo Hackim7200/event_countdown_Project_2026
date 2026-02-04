@@ -22,6 +22,13 @@ class _TodoScreenState extends State<TodoScreen> {
     _refreshTodos();
   }
 
+  /// Returns the user's ID token, or null if not signed in.
+  Future<String?> _getIdToken() async {
+    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+    if (!session.isSignedIn) return null;
+    return session.userPoolTokensResult.value.idToken.raw;
+  }
+
   Future<void> _refreshTodos() async {
     try {
       final token = await _getIdToken();
@@ -56,11 +63,46 @@ class _TodoScreenState extends State<TodoScreen> {
     }
   }
 
-  /// Returns the user's ID token, or null if not signed in.
-  Future<String?> _getIdToken() async {
-    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-    if (!session.isSignedIn) return null;
-    return session.userPoolTokensResult.value.idToken.raw;
+  Future<void> _completeTodo(String id) async {
+    try {
+      final token = await _getIdToken();
+      if (token == null) {
+        safePrint('User is not signed in');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please sign in to complete tasks'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      safePrint('Completing todo with id: $id');
+
+      final response = await Amplify.API
+          .put(
+            '/todos',
+            apiName: 'CountdownApi',
+            queryParameters: {'id': id},
+            body: HttpPayload.json({'completed': true}),
+            headers: {'Authorization': token},
+          )
+          .response;
+
+      safePrint(
+        'Complete todo response (${response.statusCode}): ${response.decodeBody()}',
+      );
+
+      if (response.statusCode == 200) {
+        await _refreshTodos();
+      } else {
+        safePrint('Failed to complete todo: ${response.statusCode}');
+      }
+    } catch (e) {
+      safePrint('Error completing todo: $e');
+    }
   }
 
   Future<void> _addTodo() async {
@@ -94,11 +136,10 @@ class _TodoScreenState extends State<TodoScreen> {
                     value: todo.isCompleted,
                     onChanged: (value) {
                       if (value == true) {
-                        // _completeTodo(todo.id);
+                        _completeTodo(todo.id);
                       }
                     },
                   ),
-                  onLongPress: () {},
                 );
               },
             ),
