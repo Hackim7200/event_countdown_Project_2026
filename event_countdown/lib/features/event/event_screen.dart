@@ -1,15 +1,52 @@
-// import 'package:amplify_authenticator/amplify_authenticator.dart';
+import 'package:event_countdown/features/event/sub_screens/future_section.dart';
+import 'package:event_countdown/features/event/sub_screens/past_section.dart';
+import 'package:event_countdown/features/event/forms/add_event_bottom_sheet.dart';
+import 'package:event_countdown/features/models/event_model.dart';
 import 'package:flutter/material.dart';
 
-class EventScreen extends StatelessWidget {
+class EventScreen extends StatefulWidget {
   const EventScreen({super.key});
 
   @override
+  State<EventScreen> createState() => _EventScreenState();
+}
+
+class _EventScreenState extends State<EventScreen> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Event"), centerTitle: true),
-      body: const Center(
-        child: Text('Event screen', style: TextStyle(fontSize: 18)),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Events"), centerTitle: true),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () async {
+            final newEvent = await showModalBottomSheet<Event>(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => const AddEventBottomSheet(),
+            );
+            if (!mounted) return;
+            if (newEvent != null) {
+              // Handle new event - refresh the list
+              setState(() {});
+            }
+          },
+        ),
+        body: const Column(
+          children: [
+            TabBar(
+              tabs: [
+                Tab(text: "Past"),
+                Tab(text: "Future"),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(children: [PastSection(), FutureSection()]),
+            ),
+          ],
+        ),
       ),
     );
   }

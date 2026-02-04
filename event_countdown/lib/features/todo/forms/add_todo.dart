@@ -1,5 +1,4 @@
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
-import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:event_countdown/features/models/todo_model.dart';
 import 'package:flutter/material.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
@@ -27,13 +26,6 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     });
   }
 
-  /// Returns the user's ID token, or null if not signed in.
-  Future<String?> _getIdToken() async {
-    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-    if (!session.isSignedIn) return null;
-    return session.userPoolTokensResult.value.idToken.raw;
-  }
-
   void _addTask() async {
     // Validate input
     if (_taskNameController.text.trim().isEmpty) {
@@ -49,49 +41,24 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     setState(() => _isLoading = true);
 
     try {
-      final token = await _getIdToken();
-      if (token == null) {
-        safePrint('User is not signed in');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Please sign in to add tasks'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-        setState(() => _isLoading = false);
-        return;
-      }
+      // Simulate a small delay for UX
+      await Future.delayed(const Duration(milliseconds: 300));
 
-      final response = await Amplify.API
-          .post(
-            '/todos',
-            apiName: 'CountdownApi',
-            body: HttpPayload.json({
-              'title': _taskNameController.text.trim(),
-              'completed': false,
-              'dueDate': _selectedDate.toIso8601String(),
-              'createdAt': DateTime.now().toIso8601String(),
-              'pomodoros': _pomodoros.toInt(),
-            }),
-            headers: {'Authorization': token},
-          )
-          .response;
-
-      safePrint(
-        'Todo added (${response.statusCode}): ${response.decodeBody()}',
+      // Create the todo with a unique ID
+      final newTodo = Todo(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: _taskNameController.text.trim(),
+        dueDate: _selectedDate,
+        pomodoros: _pomodoros.toInt(),
       );
 
-      // If we get here, the todo was added successfully
-      if (mounted) {
-        Navigator.of(context).pop(true); // Return true to indicate success
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Task created successfully')),
-        );
-      }
+      if (!mounted) return;
+
+      Navigator.of(context).pop(newTodo);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Task created successfully')),
+      );
     } catch (e) {
-      safePrint('Error creating task: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
