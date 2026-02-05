@@ -4,6 +4,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/features/models/todo_model.dart';
 
 /// Service class for handling all Todo-related API operations.
+/// Backend uses a single-table design; all requests require the current user's id (Cognito sub).
 class TodoService {
   static const String _apiName = 'CountdownApi';
   static const String _todosEndpoint = '/todos';
@@ -21,12 +22,24 @@ class TodoService {
     }
   }
 
-  /// Fetches all todos from the API.
+  /// Returns the current user's id (Cognito sub) for single-table API requests.
+  Future<String?> getUserId() async {
+    try {
+      final user = await Amplify.Auth.getCurrentUser();
+      return user.userId;
+    } catch (e) {
+      safePrint('Error getting current user: $e');
+      return null;
+    }
+  }
+
+  /// Fetches all todos from the API for the current user.
   /// Returns an empty list if the user is not signed in or if the request fails.
   Future<List<Todo>> getTodos() async {
     try {
       final token = await getIdToken();
-      if (token == null) {
+      final userId = await getUserId();
+      if (token == null || userId == null) {
         safePrint('User is not signed in');
         return [];
       }
@@ -35,7 +48,8 @@ class TodoService {
           .get(
             _todosEndpoint,
             apiName: _apiName,
-            headers: {'Authorization': token},
+            queryParameters: {'userId': userId},
+            headers: {'Authorization': 'Bearer $token'},
           )
           .response;
 
@@ -60,7 +74,8 @@ class TodoService {
   Future<bool> completeTodo(String id) async {
     try {
       final token = await getIdToken();
-      if (token == null) {
+      final userId = await getUserId();
+      if (token == null || userId == null) {
         safePrint('User is not signed in');
         return false;
       }
@@ -71,9 +86,9 @@ class TodoService {
           .put(
             _todosEndpoint,
             apiName: _apiName,
-            queryParameters: {'id': id},
+            queryParameters: {'userId': userId, 'id': id},
             body: HttpPayload.json({'completed': true}),
-            headers: {'Authorization': token},
+            headers: {'Authorization': 'Bearer $token'},
           )
           .response;
 
@@ -90,6 +105,7 @@ class TodoService {
 
   /// Adds a new todo.
   /// Returns true if successful, false otherwise.
+  /// Backend expects [date] and [userId] for single-table access.
   Future<bool> addTodo({
     required String title,
     required DateTime dueDate,
@@ -97,7 +113,8 @@ class TodoService {
   }) async {
     try {
       final token = await getIdToken();
-      if (token == null) {
+      final userId = await getUserId();
+      if (token == null || userId == null) {
         safePrint('User is not signed in');
         return false;
       }
@@ -107,13 +124,14 @@ class TodoService {
             _todosEndpoint,
             apiName: _apiName,
             body: HttpPayload.json({
+              'userId': userId,
               'title': title,
               'completed': false,
-              'dueDate': dueDate.toIso8601String(),
+              'date': dueDate.toIso8601String(),
               'createdAt': DateTime.now().toIso8601String(),
               'pomodoros': pomodoros,
             }),
-            headers: {'Authorization': token},
+            headers: {'Authorization': 'Bearer $token'},
           )
           .response;
 
@@ -122,6 +140,9 @@ class TodoService {
       );
 
       return response.statusCode == 200 || response.statusCode == 201;
+    } on ApiException catch (e) {
+      safePrint('Todo create API error: $e');
+      return false;
     } catch (e) {
       safePrint('Error creating todo: $e');
       return false;

@@ -12,6 +12,9 @@ class TodoScreen extends StatefulWidget {
 }
 
 class _TodoScreenState extends State<TodoScreen> {
+  /// Incremented when a todo is added so tab sections refetch from the API.
+  int _refreshKey = 0;
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -29,21 +32,23 @@ class _TodoScreenState extends State<TodoScreen> {
             );
             if (!mounted) return;
             if (newTodo != null) {
-              // Handle new todo - refresh the list
-              setState(() {});
+              setState(() => _refreshKey++);
             }
           },
         ),
-        body: const Column(
+        body: Column(
           children: [
-            TabBar(
+            const TabBar(
               tabs: [
                 Tab(text: "Today"),
                 Tab(text: "Tomorrow"),
               ],
             ),
             Expanded(
-              child: TabBarView(children: [TodaySection(), TomorrowSection()]),
+              child: TabBarView(
+                key: ValueKey(_refreshKey),
+                children: const [TodaySection(), TomorrowSection()],
+              ),
             ),
           ],
         ),

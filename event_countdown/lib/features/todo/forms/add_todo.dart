@@ -1,4 +1,5 @@
 import 'package:event_countdown/features/models/todo_model.dart';
+import 'package:event_countdown/features/todo/services/todo_service.dart';
 import 'package:flutter/material.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
@@ -41,12 +42,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     setState(() => _isLoading = true);
 
     try {
-      // Simulate a small delay for UX
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      // Create the todo with a unique ID
-      final newTodo = Todo(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+      final success = await TodoService().addTodo(
         title: _taskNameController.text.trim(),
         dueDate: _selectedDate,
         pomodoros: _pomodoros.toInt(),
@@ -54,10 +50,27 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
       if (!mounted) return;
 
-      Navigator.of(context).pop(newTodo);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Task created successfully')),
-      );
+      if (success) {
+        final newTodo = Todo(
+          id: '', // Server assigns id; list will refetch and show real id
+          title: _taskNameController.text.trim(),
+          dueDate: _selectedDate,
+          pomodoros: _pomodoros.toInt(),
+        );
+        Navigator.of(context).pop(newTodo);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Task created successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Failed to create task. Check sign-in and try again.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

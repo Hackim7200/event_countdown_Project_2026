@@ -12,15 +12,15 @@ const String amplifyconfig = '''
         "CredentialsProvider": {
           "CognitoIdentity": {
             "Default": {
-              "PoolId": "eu-west-2:92c25dec-d765-4bc1-a21a-1e144ddfa755",
+              "PoolId": "eu-west-2:b74c11d6-a63b-4bb2-98db-21016aed0523",
               "Region": "eu-west-2"
             }
           }
         },
         "CognitoUserPool": {
           "Default": {
-            "PoolId": "eu-west-2_gCBULy3Py",
-            "AppClientId": "7e0deiftagubqp5o8utrj9jhn2",
+            "PoolId": "eu-west-2_DNDWikzXR",
+            "AppClientId": "56mrb7d6afs4k68ujloe78l0fe",
             "Region": "eu-west-2"
           }
         },
@@ -47,7 +47,7 @@ const String amplifyconfig = '''
       "awsAPIPlugin": {
         "CountdownApi": {
           "endpointType": "REST",
-          "endpoint": "https://950tph40jc.execute-api.eu-west-2.amazonaws.com/prod",
+          "endpoint": "https://r3rf9gpp6e.execute-api.eu-west-2.amazonaws.com/prod/",
           "region": "eu-west-2",
           "authorizationType": "AMAZON_COGNITO_USER_POOLS"
         }

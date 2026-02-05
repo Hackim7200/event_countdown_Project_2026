@@ -14,14 +14,16 @@ class Todo {
     this.pomodoros = 1,
   });
 
-  /// Create a Todo from JSON response
+  /// Create a Todo from JSON response.
+  /// Backend returns [date]; we accept [date] or [dueDate] for compatibility.
   factory Todo.fromJson(Map<String, dynamic> json) {
+    final dateStr = json['date'] ?? json['dueDate'];
     return Todo(
       id: json['id'] as String,
       title: json['title'] as String,
       isCompleted: json['completed'] as bool? ?? false,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
+      dueDate: dateStr != null
+          ? DateTime.parse(dateStr as String)
           : DateTime.now(),
       pomodoros: json['pomodoros'] as int? ?? 1,
     );
