@@ -72,7 +72,7 @@ class EventCard extends StatelessWidget {
 
   String _getTimeDifferenceText() {
     final DateTime now = DateTime.now();
-    final Duration difference = event.date.difference(now);
+    final Duration difference = event.dueDate.difference(now);
 
     final int days = difference.inDays;
     final int hours = difference.inHours % 24;

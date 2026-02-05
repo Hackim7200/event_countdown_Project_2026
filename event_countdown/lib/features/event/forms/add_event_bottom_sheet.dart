@@ -1,4 +1,4 @@
-import 'package:event_countdown/app/theme.dart';
+
 import 'package:event_countdown/core/app_icons.dart';
 import 'package:event_countdown/features/models/event_model.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +82,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
         description: _descriptionController.text.trim().isNotEmpty
             ? _descriptionController.text.trim()
             : null,
-        date: eventDateTime,
+        dueDate: eventDateTime,
         icon: _selectedIcon,
       );
 
