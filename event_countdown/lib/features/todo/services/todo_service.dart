@@ -33,9 +33,12 @@ class TodoService {
     }
   }
 
-  /// Fetches all todos from the API for the current user.
+  /// Fetches todos from the API for the current user.
+  /// If [forDate] is provided, only todos for that date are returned (backend query).
+  /// If [forDate] is null, no date filter is sent and the backend may return no items
+  /// (backend expects date for the list query). Prefer passing [forDate] for the Today screen.
   /// Returns an empty list if the user is not signed in or if the request fails.
-  Future<List<Todo>> getTodos() async {
+  Future<List<Todo>> getTodos({DateTime? forDate}) async {
     try {
       final token = await getIdToken();
       final userId = await getUserId();
@@ -44,11 +47,16 @@ class TodoService {
         return [];
       }
 
+      final queryParams = <String, String>{'userId': userId};
+      if (forDate != null) {
+        queryParams['date'] = forDate.toIso8601String().split('T')[0];
+      }
+
       final response = await Amplify.API
           .get(
             _todosEndpoint,
             apiName: _apiName,
-            queryParameters: {'userId': userId},
+            queryParameters: queryParams,
             headers: {'Authorization': 'Bearer $token'},
           )
           .response;
@@ -127,8 +135,7 @@ class TodoService {
               'userId': userId,
               'title': title,
               'completed': false,
-              'date': dueDate.toIso8601String(),
-              'createdAt': DateTime.now().toIso8601String(),
+              'date': dueDate.toIso8601String().split('T')[0],
               'pomodoros': pomodoros,
             }),
             headers: {'Authorization': 'Bearer $token'},

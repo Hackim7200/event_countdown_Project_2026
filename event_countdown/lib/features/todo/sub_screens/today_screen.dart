@@ -29,15 +29,8 @@ class _TodaySectionState extends State<TodaySection> {
     });
 
     try {
-      final allTodos = await _todoService.getTodos();
-
-      // Filter for today's todos
       final now = DateTime.now();
-      final todayTodos = allTodos.where((todo) {
-        return todo.dueDate.year == now.year &&
-            todo.dueDate.month == now.month &&
-            todo.dueDate.day == now.day;
-      }).toList();
+      final todayTodos = await _todoService.getTodos(forDate: now);
 
       if (mounted) {
         setState(() {
