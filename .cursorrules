@@ -1,0 +1,555 @@
+# Project Cursor Rules - Flutter + AWS CDK Infrastructure
+
+## Project Overview
+
+This is a hybrid project containing:
+
+- **Flutter mobile application** (iOS/Android) with Amplify integration
+- **AWS CDK infrastructure** for backend services
+- Focus: Event and Todo management features
+
+## Core Principles
+
+1. **Understandability First**: Code should be self-documenting and easy to comprehend
+2. **Simplicity Over Cleverness**: Prefer straightforward solutions over complex optimizations
+3. **Consistency**: Follow established patterns within the codebase
+4. **Maintainability**: Write code that's easy to modify and extend
+
+---
+
+## Flutter Development Guidelines
+
+### Code Organization
+
+- Follow feature-first architecture in `lib/features/`
+- Each feature should have clear separation: screens, widgets, services, models
+- Keep `core/` for shared utilities, widgets, and services
+- Place app-level configuration in `app/` directory
+
+### Dart/Flutter Best Practices
+
+#### 1. Widget Structure
+
+```dart
+// ✅ GOOD: Clear, named widgets with const constructors
+class EventCard extends StatelessWidget {
+  const EventCard({
+    super.key,
+    required this.event,
+    this.onTap,
+  });
+
+  final Event event;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        title: Text(event.title),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+// ❌ AVOID: Inline widgets, missing const
+Widget buildEventCard(Event event) {
+  return Card(child: ListTile(title: Text(event.title)));
+}
+```
+
+#### 2. State Management
+
+- Use simple state management (Provider, Riverpod, or built-in StatefulWidget)
+- Avoid over-engineering state solutions
+- Keep state close to where it's used
+- Document state dependencies clearly
+
+```dart
+// ✅ GOOD: Clear state with descriptive names
+class TodoScreenState extends State<TodoScreen> {
+  bool _isLoading = false;
+  List<Todo> _todos = [];
+  String? _errorMessage;
+
+  // Methods are clearly named and focused
+  Future<void> _loadTodos() async {
+    setState(() => _isLoading = true);
+    try {
+      _todos = await _todoService.fetchTodos();
+    } catch (e) {
+      _errorMessage = 'Failed to load todos: ${e.toString()}';
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+}
+```
+
+#### 3. Naming Conventions
+
+- Classes: `PascalCase` (EventCard, TodoService)
+- Files: `snake_case` (event_card.dart, todo_service.dart)
+- Variables/Functions: `camelCase` (eventTitle, loadTodos)
+- Constants: `lowerCamelCase` for local, `SCREAMING_SNAKE_CASE` for global
+- Private members: prefix with `_` (\_isLoading, \_loadTodos)
+
+#### 4. Error Handling
+
+```dart
+// ✅ GOOD: Explicit error handling with user feedback
+Future<void> deleteEvent(String id) async {
+  try {
+    await _eventService.delete(id);
+    _showSuccessMessage('Event deleted successfully');
+  } on NetworkException catch (e) {
+    _showErrorMessage('Network error: ${e.message}');
+  } catch (e) {
+    _showErrorMessage('Unexpected error occurred');
+    debugPrint('Delete event error: $e');
+  }
+}
+
+// ❌ AVOID: Silent failures
+Future<void> deleteEvent(String id) async {
+  try {
+    await _eventService.delete(id);
+  } catch (e) {
+    // Silent failure - user doesn't know what happened
+  }
+}
+```
+
+#### 5. Async/Await
+
+- Always use `async`/`await` instead of `.then()`
+- Add `unawaited()` from `dart:async` for fire-and-forget operations
+- Handle errors explicitly at appropriate levels
+
+#### 6. Code Documentation
+
+```dart
+/// Displays a card for an event with title, date, and actions.
+///
+/// The card is tappable and can trigger navigation to event details.
+/// Shows a countdown if the event is in the future.
+class EventCard extends StatelessWidget {
+  const EventCard({
+    super.key,
+    required this.event,
+    this.onTap,
+    this.showCountdown = true,
+  });
+
+  /// The event to display
+  final Event event;
+
+  /// Callback when card is tapped
+  final VoidCallback? onTap;
+
+  /// Whether to show countdown timer
+  final bool showCountdown;
+
+  // ... implementation
+}
+```
+
+#### 7. Null Safety
+
+- Use null-safety features properly (`?`, `!`, `??`, `?.`)
+- Prefer `??` over `? :` for default values
+- Avoid using `!` unless absolutely certain
+
+```dart
+// ✅ GOOD: Safe null handling
+final title = event.title ?? 'Untitled Event';
+final description = event.description?.trim() ?? '';
+
+// ❌ AVOID: Risky null assertion
+final title = event.title!; // Can crash if null
+```
+
+### UI/UX Guidelines
+
+- Use `Theme.of(context)` for colors and text styles
+- Prefer `const` constructors for better performance
+- Extract repeated UI patterns into reusable widgets
+- Keep build methods focused and readable (< 100 lines)
+- Use meaningful spacing with `SizedBox` or padding constants
+
+### Services & Business Logic
+
+- Keep services in `features/[feature]/services/`
+- One responsibility per service
+- Use dependency injection where possible
+- Mock services for testing
+
+```dart
+// ✅ GOOD: Focused service with clear interface
+class TodoService {
+  TodoService({required AmplifyDataStore dataStore})
+      : _dataStore = dataStore;
+
+  final AmplifyDataStore _dataStore;
+
+  /// Fetches all todos for the current user
+  Future<List<Todo>> fetchTodos() async {
+    // Implementation
+  }
+
+  /// Creates a new todo
+  Future<Todo> createTodo({
+    required String title,
+    String? description,
+  }) async {
+    // Implementation
+  }
+}
+```
+
+### Models
+
+- Use immutable models with `@immutable` annotation
+- Implement `copyWith`, `==`, and `hashCode` for data models
+- Consider using code generation (freezed, json_serializable) for complex models
+
+```dart
+// ✅ GOOD: Clean, immutable model
+@immutable
+class Event {
+  const Event({
+    required this.id,
+    required this.title,
+    required this.date,
+    this.description,
+  });
+
+  final String id;
+  final String title;
+  final DateTime date;
+  final String? description;
+
+  Event copyWith({
+    String? title,
+    DateTime? date,
+    String? description,
+  }) {
+    return Event(
+      id: id,
+      title: title ?? this.title,
+      date: date ?? this.date,
+      description: description ?? this.description,
+    );
+  }
+}
+```
+
+---
+
+## AWS CDK Guidelines
+
+### Infrastructure as Code Principles
+
+#### 1. Stack Organization
+
+- One stack per logical environment/service
+- Use nested stacks for complex architectures
+- Keep stacks focused and manageable (< 200 LOC)
+
+```typescript
+// ✅ GOOD: Focused, well-named stack
+export class TodoApiStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // API Gateway
+    const api = new apigateway.RestApi(this, "TodoApi", {
+      restApiName: "Todo Service",
+      description: "API for todo management",
+    });
+
+    // Lambda function
+    const todoHandler = new lambda.Function(this, "TodoHandler", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: "index.handler",
+      code: lambda.Code.fromAsset("lambda"),
+    });
+
+    // Connect resources
+    const todosResource = api.root.addResource("todos");
+    todosResource.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(todoHandler),
+    );
+  }
+}
+```
+
+#### 2. Resource Naming
+
+- Use descriptive, consistent names
+- Include environment in resource names for multi-env deployments
+- Follow AWS naming conventions
+
+```typescript
+// ✅ GOOD: Clear, environment-aware naming
+const todoTable = new dynamodb.Table(this, "TodoTable", {
+  tableName: `${props.environment}-todos`,
+  partitionKey: { name: "userId", type: dynamodb.AttributeType.STRING },
+  sortKey: { name: "todoId", type: dynamodb.AttributeType.STRING },
+});
+
+// ❌ AVOID: Vague names
+const table = new dynamodb.Table(this, "Table1", {
+  tableName: "data",
+});
+```
+
+#### 3. Configuration Management
+
+- Use CDK context for environment-specific values
+- Keep secrets in AWS Secrets Manager or Parameter Store
+- Document all configuration options
+
+```typescript
+// ✅ GOOD: Externalized configuration
+interface TodoStackProps extends cdk.StackProps {
+  environment: "dev" | "staging" | "prod";
+  tableCapacity?: {
+    readCapacity: number;
+    writeCapacity: number;
+  };
+}
+
+export class TodoStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props: TodoStackProps) {
+    super(scope, id, props);
+
+    const capacity = props.tableCapacity ?? {
+      readCapacity: 5,
+      writeCapacity: 5,
+    };
+
+    // Use configuration
+  }
+}
+```
+
+#### 4. Security Best Practices
+
+- Apply principle of least privilege for IAM roles
+- Enable encryption at rest and in transit
+- Use VPC for sensitive resources
+- Never hardcode credentials
+
+```typescript
+// ✅ GOOD: Minimal IAM permissions
+todoHandler.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem"],
+    resources: [todoTable.tableArn],
+  }),
+);
+
+// ❌ AVOID: Overly permissive
+todoHandler.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ["dynamodb:*"],
+    resources: ["*"],
+  }),
+);
+```
+
+#### 5. Tagging Strategy
+
+- Tag all resources for cost tracking and organization
+- Include: Environment, Project, Owner, CostCenter
+
+```typescript
+// ✅ GOOD: Comprehensive tagging
+cdk.Tags.of(this).add("Environment", props.environment);
+cdk.Tags.of(this).add("Project", "EventCountdown");
+cdk.Tags.of(this).add("ManagedBy", "CDK");
+```
+
+#### 6. Construct Reusability
+
+- Extract common patterns into custom constructs
+- Share constructs across stacks when appropriate
+
+```typescript
+// ✅ GOOD: Reusable construct
+export class ApiLambdaConstruct extends Construct {
+  public readonly handler: lambda.Function;
+  public readonly api: apigateway.RestApi;
+
+  constructor(scope: Construct, id: string, props: ApiLambdaProps) {
+    super(scope, id);
+
+    this.handler = new lambda.Function(this, "Handler", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: props.handler,
+      code: lambda.Code.fromAsset(props.codePath),
+      environment: props.environment,
+    });
+
+    this.api = new apigateway.RestApi(this, "Api", {
+      restApiName: props.apiName,
+    });
+  }
+}
+```
+
+---
+
+## Amplify Integration
+
+### Configuration
+
+- Keep `amplifyconfiguration.dart` version-controlled
+- Document any manual Amplify configuration steps
+- Use Amplify CLI for schema updates
+
+### Data Models
+
+- Define GraphQL schema clearly
+- Use proper relationships (@hasMany, @belongsTo)
+- Add appropriate authorization rules
+
+### Auth Flow
+
+- Handle authentication states properly
+- Implement proper sign-in/sign-out flows
+- Store auth state at app level
+
+---
+
+## General Guidelines
+
+### Git Workflow
+
+- Write clear, descriptive commit messages
+- Keep commits focused on single changes
+- Use conventional commits format when possible
+  - `feat:` for new features
+  - `fix:` for bug fixes
+  - `refactor:` for code improvements
+  - `docs:` for documentation
+
+### Testing
+
+- Write tests for business logic and services
+- Test edge cases and error conditions
+- Keep tests simple and readable
+- Mock external dependencies
+
+### Performance
+
+- Use `const` constructors liberally
+- Avoid rebuilding widgets unnecessarily
+- Profile before optimizing
+- Consider ListView.builder for long lists
+
+### Code Review Checklist
+
+- [ ] Code is self-documenting with clear names
+- [ ] Error handling is explicit and user-friendly
+- [ ] No hardcoded values (use constants or configuration)
+- [ ] Follows project structure and conventions
+- [ ] Null safety properly implemented
+- [ ] No unnecessary complexity
+- [ ] Documentation added for public APIs
+- [ ] Tests added/updated if needed
+
+---
+
+## Common Patterns to Follow
+
+### Loading States
+
+```dart
+// ✅ Consistent loading pattern
+Widget build(BuildContext context) {
+  if (_isLoading) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  if (_errorMessage != null) {
+    return Center(child: Text(_errorMessage!));
+  }
+
+  return ListView.builder(
+    itemCount: _items.length,
+    itemBuilder: (context, index) => ItemCard(item: _items[index]),
+  );
+}
+```
+
+### Navigation
+
+```dart
+// ✅ Type-safe navigation with GoRouter
+context.go('/events/${event.id}');
+
+// Or with named routes
+context.goNamed('eventDetail', params: {'id': event.id});
+```
+
+### Form Validation
+
+```dart
+// ✅ Clear validation logic
+String? _validateTitle(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Title is required';
+  }
+  if (value.length > 100) {
+    return 'Title must be less than 100 characters';
+  }
+  return null;
+}
+```
+
+---
+
+## When Making Changes
+
+1. **Read existing code** - Understand the current patterns before adding new code
+2. **Ask "why"** - If something seems complex, consider if there's a simpler way
+3. **Extract when repeating** - DRY principle, but don't over-abstract
+4. **Document decisions** - Add comments explaining "why", not "what"
+5. **Test your changes** - Manually test the happy path and edge cases
+6. **Keep it simple** - The simplest solution that works is usually the best
+
+---
+
+## Red Flags to Avoid
+
+- ❌ Deep widget nesting (> 5 levels)
+- ❌ Large build methods (> 100 lines)
+- ❌ God classes/widgets that do too much
+- ❌ Hardcoded strings, colors, or dimensions
+- ❌ Swallowing exceptions without logging
+- ❌ Using `!` null assertion frequently
+- ❌ Wildcard permissions in IAM policies
+- ❌ Mixing business logic with UI code
+- ❌ Unclear variable names (x, temp, data)
+- ❌ Missing error handling on async operations
+
+---
+
+## Questions to Ask Before Coding
+
+1. Is there an existing pattern for this in the codebase?
+2. Can this be simpler?
+3. Will another developer understand this in 6 months?
+4. What happens if this fails?
+5. Is this the right abstraction level?
+6. Am I following the single responsibility principle?
+
+---
+
+**Remember**: Code is read far more often than it's written. Optimize for readability and maintainability over cleverness.

@@ -1,7 +1,6 @@
+import 'package:event_countdown/features/event/forms/add_event_bottom_sheet.dart';
 import 'package:event_countdown/features/event/sub_screens/future_section.dart';
 import 'package:event_countdown/features/event/sub_screens/past_section.dart';
-import 'package:event_countdown/features/event/forms/add_event_bottom_sheet.dart';
-import 'package:event_countdown/features/models/event_model.dart';
 import 'package:flutter/material.dart';
 
 class EventScreen extends StatefulWidget {
@@ -12,6 +11,22 @@ class EventScreen extends StatefulWidget {
 }
 
 class _EventScreenState extends State<EventScreen> {
+  /// Incremented when an event is added so tab sections refetch from the API.
+  int _refreshKey = 0;
+
+  Future<void> _openAddEventSheet() async {
+    final created = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AddEventBottomSheet(),
+    );
+    if (!mounted) return;
+    if (created == true) {
+      setState(() => _refreshKey++);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -20,30 +35,21 @@ class _EventScreenState extends State<EventScreen> {
         appBar: AppBar(title: const Text("Events"), centerTitle: true),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () async {
-            final newEvent = await showModalBottomSheet<Event>(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (context) => const AddEventBottomSheet(),
-            );
-            if (!mounted) return;
-            if (newEvent != null) {
-              // Handle new event - refresh the list
-              setState(() {});
-            }
-          },
+          onPressed: _openAddEventSheet,
         ),
-        body: const Column(
+        body: Column(
           children: [
-            TabBar(
+            const TabBar(
               tabs: [
                 Tab(text: "Past"),
                 Tab(text: "Future"),
               ],
             ),
             Expanded(
-              child: TabBarView(children: [PastSection(), FutureSection()]),
+              child: TabBarView(
+                key: ValueKey(_refreshKey),
+                children: const [PastSection(), FutureSection()],
+              ),
             ),
           ],
         ),

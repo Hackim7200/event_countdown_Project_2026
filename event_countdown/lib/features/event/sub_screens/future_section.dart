@@ -1,3 +1,4 @@
+import 'package:event_countdown/features/event/services/event_service.dart';
 import 'package:event_countdown/features/event/widgets/event_card.dart';
 import 'package:event_countdown/features/models/event_model.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class FutureSection extends StatefulWidget {
 }
 
 class _FutureSectionState extends State<FutureSection> {
+  final EventService _eventService = EventService();
   List<Event> _futureEvents = [];
   bool _isLoading = true;
 
@@ -20,11 +22,13 @@ class _FutureSectionState extends State<FutureSection> {
   }
 
   Future<void> _loadEvents() async {
-    // Simulate loading delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    if (mounted) {
+      setState(() => _isLoading = true);
+    }
+    final events = await _eventService.getEvents(futureOrPast: 'future');
     if (mounted) {
       setState(() {
-        _futureEvents = DummyEvents.getFutureEvents();
+        _futureEvents = events;
         _isLoading = false;
       });
     }

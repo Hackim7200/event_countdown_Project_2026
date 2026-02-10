@@ -5,7 +5,6 @@ class Event {
   final DateTime dueDate;
   final String? description;
   final int icon;
-  
 
   Event({
     required this.id,
@@ -14,6 +13,22 @@ class Event {
     required this.dueDate,
     required this.icon,
   });
+
+  /// Parses an event from API/JSON map.
+  /// Expects [dueDate] as ISO8601 string; [icon] as int.
+  factory Event.fromJson(Map<String, dynamic> json) {
+    final dueDateRaw = json['dueDate'];
+    final dueDate = dueDateRaw is String
+        ? DateTime.parse(dueDateRaw)
+        : DateTime.tryParse(dueDateRaw.toString()) ?? DateTime.now();
+    return Event(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String?,
+      dueDate: dueDate,
+      icon: (json['icon'] as num?)?.toInt() ?? 0,
+    );
+  }
 
   /// Calculate days remaining until the event
   int get daysRemaining {

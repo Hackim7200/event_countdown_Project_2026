@@ -1,6 +1,5 @@
-
 import 'package:event_countdown/core/app_icons.dart';
-import 'package:event_countdown/features/models/event_model.dart';
+import 'package:event_countdown/features/event/services/event_service.dart';
 import 'package:flutter/material.dart';
 
 class AddEventBottomSheet extends StatefulWidget {
@@ -11,6 +10,7 @@ class AddEventBottomSheet extends StatefulWidget {
 }
 
 class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
+  final _eventService = EventService();
   final _eventNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
@@ -53,7 +53,6 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
   }
 
   Future<void> onAddEvent() async {
-    // Validate input
     if (_eventNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter an event name')),
@@ -61,12 +60,9 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
-      // Combine date and time into a single DateTime
       final eventDateTime = DateTime(
         _selectedDate.year,
         _selectedDate.month,
@@ -75,24 +71,34 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
         _selectedTime.minute,
       );
 
-      // Create the event with a unique ID
-      final newEvent = Event(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: _eventNameController.text.trim(),
-        description: _descriptionController.text.trim().isNotEmpty
-            ? _descriptionController.text.trim()
-            : null,
+      final title = _eventNameController.text.trim();
+      final description = _descriptionController.text.trim().isNotEmpty
+          ? _descriptionController.text.trim()
+          : null;
+
+      final id = await _eventService.addEvent(
+        title: title,
         dueDate: eventDateTime,
+        description: description,
         icon: _selectedIcon,
+        location: null,
       );
 
-      // Simulate a small delay for UX
-      await Future.delayed(const Duration(milliseconds: 300));
+      if (!mounted) return;
 
-      if (mounted) {
-        Navigator.of(context).pop(newEvent);
+      if (id != null) {
+        Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Event created successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Failed to create event. Check that you are signed in and try again.',
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
         );
       }
     } catch (e) {
@@ -106,9 +112,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }

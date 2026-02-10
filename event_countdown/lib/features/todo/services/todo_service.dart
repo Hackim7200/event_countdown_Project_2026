@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:event_countdown/core/service/auth_service.dart';
 import 'package:event_countdown/features/models/todo_model.dart';
 
 /// Service class for handling all Todo-related API operations.
@@ -9,29 +10,7 @@ class TodoService {
   static const String _apiName = 'CountdownApi';
   static const String _todosEndpoint = '/todos';
 
-  /// Returns the user's ID token, or null if not signed in.
-  Future<String?> getIdToken() async {
-    try {
-      final session =
-          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-      if (!session.isSignedIn) return null;
-      return session.userPoolTokensResult.value.idToken.raw;
-    } catch (e) {
-      safePrint('Error fetching auth session: $e');
-      return null;
-    }
-  }
-
-  /// Returns the current user's id (Cognito sub) for single-table API requests.
-  Future<String?> getUserId() async {
-    try {
-      final user = await Amplify.Auth.getCurrentUser();
-      return user.userId;
-    } catch (e) {
-      safePrint('Error getting current user: $e');
-      return null;
-    }
-  }
+  final AuthService authService = AuthService();
 
   /// Fetches todos from the API for the current user.
   /// If [forDate] is provided, only todos for that date are returned (backend query).
@@ -40,8 +19,8 @@ class TodoService {
   /// Returns an empty list if the user is not signed in or if the request fails.
   Future<List<Todo>> getTodos({DateTime? forDate}) async {
     try {
-      final token = await getIdToken();
-      final userId = await getUserId();
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
       if (token == null || userId == null) {
         safePrint('User is not signed in');
         return [];
@@ -74,6 +53,9 @@ class TodoService {
     } on ApiException catch (e) {
       safePrint('Query failed: $e');
       return [];
+    } catch (e) {
+      safePrint('Error fetching todos: $e');
+      return [];
     }
   }
 
@@ -81,8 +63,8 @@ class TodoService {
   /// Returns true if successful, false otherwise.
   Future<bool> completeTodo(String id) async {
     try {
-      final token = await getIdToken();
-      final userId = await getUserId();
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
       if (token == null || userId == null) {
         safePrint('User is not signed in');
         return false;
@@ -120,8 +102,8 @@ class TodoService {
     required int pomodoros,
   }) async {
     try {
-      final token = await getIdToken();
-      final userId = await getUserId();
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
       if (token == null || userId == null) {
         safePrint('User is not signed in');
         return false;
@@ -135,7 +117,7 @@ class TodoService {
               'userId': userId,
               'title': title,
               'completed': false,
-              'date': dueDate.toIso8601String().split('T')[0],
+              'date': dueDate.toIso8601String(),
               'pomodoros': pomodoros,
             }),
             headers: {'Authorization': 'Bearer $token'},
