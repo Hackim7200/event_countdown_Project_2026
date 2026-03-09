@@ -1,6 +1,6 @@
 import 'package:event_countdown/features/event/services/event_service.dart';
 import 'package:event_countdown/features/event/widgets/event_card.dart';
-import 'package:event_countdown/features/models/event_model.dart';
+import 'package:event_countdown/models/event_model.dart';
 import 'package:flutter/material.dart';
 
 class PastSection extends StatefulWidget {

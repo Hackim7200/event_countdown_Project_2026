@@ -1,25 +1,31 @@
-import 'package:event_countdown/models/todo_model.dart';
-import 'package:event_countdown/features/todo/services/todo_service.dart';
+import 'package:event_countdown/models/pomdoro_model.dart';
+import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
 import 'package:flutter/material.dart';
 
-class AddTaskBottomSheet extends StatefulWidget {
-  const AddTaskBottomSheet({super.key});
+/// Bottom sheet to start a new Pomodoro session for a todo.
+///
+/// Requires [todoId] and [title] of the todo this session belongs to.
+/// User can edit the title and choose timer duration; session start time is set when they tap Start.
+class AddPomodoroBottomSheet extends StatefulWidget {
+  const AddPomodoroBottomSheet({
+    super.key,
+    required this.todoId,
+    required this.title,
+  });
+
+  final String todoId;
+  final String title;
 
   @override
-  State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
+  State<AddPomodoroBottomSheet> createState() => _AddPomodoroBottomSheetState();
 }
 
-class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
+class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
+  static const int _defaultDurationMinutes = 25;
+  static const List<int> _durationOptions = [15, 25, 45];
   final _taskNameController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
-  String _selectedTimePeriod = 'Morning';
-  final List<String> _timePeriods = [
-    'Morning', // fajr to dhur
-    'Early Afternoon', // dhur to asr
-    'Late Afternoon', // asr to maghrib
-    'Twilight', // maghrib to isha
-    'Night', // isha to fajr
-  ];
+
+  int _durationMinutes = _defaultDurationMinutes;
   bool _isLoading = false;
 
   @override
@@ -28,15 +34,9 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     super.dispose();
   }
 
-  void _selectDate(DateTime date) {
-    setState(() {
-      _selectedDate = date;
-    });
-  }
-
-  void _addTask() async {
-    // Validate input
-    if (_taskNameController.text.trim().isEmpty) {
+  void _addPomodoro() async {
+    final title = _taskNameController.text.trim();
+    if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter a task name'),
@@ -49,41 +49,40 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await TodoService().addTodo(
-        title: _taskNameController.text.trim(),
-        dueDate: _selectedDate,
-        timePeriod: _selectedTimePeriod,
+      final newId = await PomodoroService().addPomodoro(
+        todoId: widget.todoId,
+        title: title,
+        timerDurationInMinutes: _durationMinutes,
       );
 
       if (!mounted) return;
 
-      if (success) {
-        final newTodo = Todo(
-          id: '', // Server assigns id; list will refetch and show real id
-          title: _taskNameController.text.trim(),
-          dueDate: _selectedDate,
-          timePeriod: _selectedTimePeriod,
+      if (newId != null && newId.isNotEmpty) {
+        final session = Pomodoro(
+          id: newId,
+          title: title,
+          completed: false,
+          timerDurationInMinutes: _durationMinutes,
         );
-        Navigator.of(context).pop(newTodo);
+        Navigator.of(context).pop(session);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Task created successfully')),
+          const SnackBar(content: Text('Pomodoro session started')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please sign in to add tasks.'),
+            content: Text(
+              'Failed to start session. Check sign-in and try again.',
+            ),
             backgroundColor: Colors.red,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        final message = e is Exception
-            ? e.toString().replaceFirst('Exception: ', '')
-            : e.toString();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(message),
+            content: Text('Failed to start session: ${e.toString()}'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -125,7 +124,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Text(
-              'Add task',
+              'Add a pomodoro',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.onSurface,
@@ -133,7 +132,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
             ),
           ),
 
-          // Task name input
+          // Task name input (same pattern as AddTaskBottomSheet)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: TextField(
@@ -154,62 +153,40 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
             ),
           ),
 
-          // Date selection section
+          // Duration section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Due Date',
+                  'Duration',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 12),
-
-                // Quick date options
                 Row(
-                  children: [
-                    Expanded(
-                      child: _buildDateOption(
-                        theme,
-                        'Today',
-                        DateTime.now(),
-                        _selectedDate,
+                  children: _durationOptions.map((minutes) {
+                    final isSelected = _durationMinutes == minutes;
+                    return Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          right: minutes != _durationOptions.last ? 8 : 0,
+                        ),
+                        child: _buildDurationOption(
+                          theme,
+                          '$minutes min',
+                          minutes,
+                          isSelected,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildDateOption(
-                        theme,
-                        'Tomorrow',
-                        DateTime.now().add(const Duration(days: 1)),
-                        _selectedDate,
-                      ),
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 ),
               ],
             ),
-          ),
-
-          DropdownButton<String>(
-            value: _selectedTimePeriod,
-            items: _timePeriods
-                .map(
-                  (timePeriod) => DropdownMenuItem<String>(
-                    value: timePeriod,
-                    child: Text(timePeriod),
-                  ),
-                )
-                .toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() => _selectedTimePeriod = value);
-              }
-            },
           ),
 
           // Action buttons
@@ -239,11 +216,9 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   ),
                 ),
                 const SizedBox(width: 16),
-
-                // Time period selection section
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _addTask,
+                    onPressed: _isLoading ? null : _addPomodoro,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -261,7 +236,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                             ),
                           )
                         : Text(
-                            'Add Task',
+                            'Add Session',
                             style: theme.textTheme.labelLarge?.copyWith(
                               color: theme.colorScheme.onPrimary,
                               fontWeight: FontWeight.w600,
@@ -280,18 +255,14 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     );
   }
 
-  Widget _buildDateOption(
+  Widget _buildDurationOption(
     ThemeData theme,
     String label,
-    DateTime date,
-    DateTime selectedDate,
+    int minutes,
+    bool isSelected,
   ) {
-    final isSelected =
-        DateTime(date.year, date.month, date.day) ==
-        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-
     return InkWell(
-      onTap: () => _selectDate(date),
+      onTap: () => setState(() => _durationMinutes = minutes),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),

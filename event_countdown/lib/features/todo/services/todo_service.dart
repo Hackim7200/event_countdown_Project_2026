@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/core/service/auth_service.dart';
-import 'package:event_countdown/features/models/todo_model.dart';
+import 'package:event_countdown/models/todo_model.dart';
 
 /// Service class for handling all Todo-related API operations.
 /// Backend uses a single-table design; all requests require the current user's id (Cognito sub).
@@ -94,21 +94,22 @@ class TodoService {
   }
 
   /// Adds a new todo.
-  /// Returns true if successful, false otherwise.
-  /// Backend expects [date] and [userId] for single-table access.
+  /// Returns true if successful, false if not signed in.
+  /// Throws on API/network errors so the caller can show the real error.
+  /// Backend expects [date], [timePeriod] and [userId] for single-table access.
   Future<bool> addTodo({
     required String title,
     required DateTime dueDate,
-    required int pomodoros,
+    required String timePeriod,
   }) async {
-    try {
-      final token = await authService.getIdToken();
-      final userId = await authService.getUserId();
-      if (token == null || userId == null) {
-        safePrint('User is not signed in');
-        return false;
-      }
+    final token = await authService.getIdToken();
+    final userId = await authService.getUserId();
+    if (token == null || userId == null) {
+      safePrint('User is not signed in');
+      return false;
+    }
 
+    try {
       final response = await Amplify.API
           .post(
             _todosEndpoint,
@@ -118,7 +119,7 @@ class TodoService {
               'title': title,
               'completed': false,
               'date': dueDate.toIso8601String(),
-              'pomodoros': pomodoros,
+              'timePeriod': timePeriod,
             }),
             headers: {'Authorization': 'Bearer $token'},
           )
@@ -128,13 +129,20 @@ class TodoService {
         'Todo added (${response.statusCode}): ${response.decodeBody()}',
       );
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }
+      final body = response.decodeBody();
+      throw Exception(
+        'Server returned ${response.statusCode}: ${body.isNotEmpty ? body : "Unknown error"}',
+      );
     } on ApiException catch (e) {
       safePrint('Todo create API error: $e');
-      return false;
+      throw Exception('Todo API error: ${e.message}');
     } catch (e) {
+      if (e is Exception) rethrow;
       safePrint('Error creating todo: $e');
-      return false;
+      throw Exception('Failed to create task: $e');
     }
   }
 }

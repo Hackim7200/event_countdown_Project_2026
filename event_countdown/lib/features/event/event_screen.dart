@@ -34,8 +34,8 @@ class _EventScreenState extends State<EventScreen> {
       child: Scaffold(
         appBar: AppBar(title: const Text("Events"), centerTitle: true),
         floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
           onPressed: _openAddEventSheet,
+          child: const Icon(Icons.add),
         ),
         body: Column(
           children: [

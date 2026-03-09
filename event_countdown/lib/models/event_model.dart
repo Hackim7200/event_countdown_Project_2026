@@ -52,7 +52,7 @@ class Event {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      dueDate: date ?? this.dueDate,
+      dueDate: date ?? dueDate,
       icon: icon ?? this.icon,
     );
   }

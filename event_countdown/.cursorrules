@@ -87,6 +87,8 @@ Generate code, corrections, and refactorings that comply with the basic principl
 - Write acceptance tests for each module.
   - Follow the Given-When-Then convention.
 
+---
+
 ## Code Readability and Documentation
 
 ### Comments and Documentation
@@ -145,6 +147,63 @@ Generate code, corrections, and refactorings that comply with the basic principl
 - Use trailing commas in multi-line parameter lists and collections.
 - Add explanatory comments before complex widget trees.
 - Document any non-standard patterns or architectural decisions.
+
+---
+
+## Cross-File Consistency
+
+### Naming Consistency
+
+- Apply the same naming conventions uniformly across every file in the project.
+  - A pattern used in one file (e.g., `fetchUserData`) must match the same pattern elsewhere (e.g., avoid `getUserData` for an equivalent function in another file).
+- Keep entity names stable: if a concept is called `UserProfile` in one layer, it must be `UserProfile` in all layers — do not rename it to `Profile`, `User`, or `AccountProfile` in other files.
+- Consistent boolean prefixes: always use the same verb prefix family (`is`, `has`, `can`) across files for the same category of state.
+
+### Structural Consistency
+
+- Apply the same class member ordering (static constants → static variables → instance variables → constructors → public methods → private methods) in every class across all files.
+- Use the same error-handling strategy throughout the codebase.
+  - If one module uses a `Result` type to surface errors, do not use raw exceptions in another module for the same category of failure.
+- Keep import ordering consistent across all files.
+  - Suggested order: Dart SDK → Flutter SDK → third-party packages → project-internal imports, each group separated by a blank line.
+
+### Architectural Consistency
+
+- Every feature or module must follow the same architectural layers (presentation → controller → repository → data source).
+  - Do not bypass layers in one feature that are respected in all others.
+- Use the same state-management approach (Riverpod) throughout; never mix Riverpod with other state-management solutions (e.g., Provider, BLoC) inside the same project without an explicit architectural decision documented in the codebase.
+- Shared abstractions (base classes, interfaces, mixins) must be reused rather than redefined per-file.
+  - Example: if a `BaseRepository` interface exists, every repository must implement it — do not create ad-hoc repository classes that omit the interface.
+
+### Pattern Consistency
+
+- If a pattern is chosen for one part of the codebase (e.g., using `freezed` for UI state, `getIt` for DI, `AutoRoute` for routing), it must be applied in the same way across all equivalent parts.
+- Factory and singleton registrations in `getIt` must follow the same rules project-wide:
+  - Services and repositories → singleton
+  - Use cases → factory
+  - Controllers → lazy singleton
+- Avoid mixing different approaches for the same concern within the same project (e.g., do not use `ThemeData` in one screen and hardcoded style values in another).
+
+### Documentation and Comment Consistency
+
+- Doc comment style (///) must be present on **all** public APIs across all files, not only in some files.
+- TODO and FIXME comment formats must be uniform: always include the author, date, and ticket reference.
+  - Example: `// TODO(jane, 2024-06-01, #PROJ-123): Replace with streaming API.`
+- Inline comment style and verbosity should be similar across equivalent complexity levels in different files.
+
+### Testing Consistency
+
+- Every public method that has a unit test in one file must have equivalent unit-test coverage in all analogous files.
+- Test file structure (Arrange-Act-Assert blocks, naming of `inputX`/`mockX`/`actualX`/`expectedX` variables) must be the same across the test suite.
+- Integration/acceptance test structure (Given-When-Then) must be applied uniformly to all modules that have acceptance tests.
+
+### Formatting Consistency
+
+- Run `dart format` on every file before committing; do not allow unformatted files to coexist with formatted ones.
+- Trailing commas in multi-line collections and parameter lists must be applied uniformly — do not add them in some files and omit them in others.
+- Maximum line length (80–100 characters) must be respected everywhere, not only in recently edited files.
+
+---
 
 ## Specific to Flutter
 

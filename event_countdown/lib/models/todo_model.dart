@@ -1,46 +1,57 @@
 /// Todo model for the app
+///
+/// [Todo] is an immutable model representing a task with a due date,
+/// completion status, associated pomodoro count, and time period.
+///
 class Todo {
   final String id;
   final String title;
   final bool isCompleted;
   final DateTime dueDate;
   final int pomodoros;
+  final String timePeriod;
 
+  /// Main constructor for [Todo].
   const Todo({
     required this.id,
     required this.title,
+    required this.timePeriod,
     this.isCompleted = false,
     required this.dueDate,
     this.pomodoros = 1,
   });
 
-  /// Create a Todo from JSON response.
-  /// Backend returns [date]; we accept [date] or [dueDate] for compatibility.
+  /// Creates a [Todo] instance from a JSON map.
+  ///
+  /// Accepts either `date` or `dueDate` fields from backend.
+  /// Defaults [isCompleted] to false and [pomodoros] to 0 if missing.
   factory Todo.fromJson(Map<String, dynamic> json) {
     final dateStr = json['date'] ?? json['dueDate'];
     return Todo(
       id: json['id'] as String,
       title: json['title'] as String,
+      timePeriod: json['timePeriod'] as String? ?? '',
       isCompleted: json['completed'] as bool? ?? false,
       dueDate: dateStr != null
           ? DateTime.parse(dateStr as String)
           : DateTime.now(),
-      pomodoros: json['pomodoros'] as int? ?? 1,
+      pomodoros: json['pomodoros'] as int? ?? 0,
     );
   }
 
-  /// Convert Todo to JSON
+  /// Converts the [Todo] to a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
+      'timePeriod': timePeriod,
       'completed': isCompleted,
       'dueDate': dueDate.toIso8601String(),
       'pomodoros': pomodoros,
     };
   }
 
-  /// Check if todo is due today
+  /// Returns true if the todo is due today.
   bool get isToday {
     final now = DateTime.now();
     return dueDate.year == now.year &&
@@ -48,7 +59,7 @@ class Todo {
         dueDate.day == now.day;
   }
 
-  /// Check if todo is due tomorrow
+  /// Returns true if the todo is due tomorrow.
   bool get isTomorrow {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
     return dueDate.year == tomorrow.year &&
@@ -56,10 +67,11 @@ class Todo {
         dueDate.day == tomorrow.day;
   }
 
-  /// Copy with method for immutability
+  /// Returns a copy of this todo with the provided fields replaced.
   Todo copyWith({
     String? id,
     String? title,
+    String? timePeriod,
     bool? isCompleted,
     DateTime? dueDate,
     int? pomodoros,
@@ -67,6 +79,7 @@ class Todo {
     return Todo(
       id: id ?? this.id,
       title: title ?? this.title,
+      timePeriod: timePeriod ?? this.timePeriod,
       isCompleted: isCompleted ?? this.isCompleted,
       dueDate: dueDate ?? this.dueDate,
       pomodoros: pomodoros ?? this.pomodoros,
@@ -75,6 +88,9 @@ class Todo {
 }
 
 /// Dummy data for testing the UI
+///
+/// Use [DummyTodos.getAll], [getTodayTodos], [getTomorrowTodos]
+/// to generate sample lists for previews and development.
 class DummyTodos {
   static List<Todo> getAll() {
     final now = DateTime.now();
@@ -85,12 +101,14 @@ class DummyTodos {
       Todo(
         id: '1',
         title: 'Review pull requests',
+        timePeriod: 'morning',
         dueDate: today,
         pomodoros: 2,
       ),
       Todo(
         id: '2',
         title: 'Write documentation',
+        timePeriod: 'afternoon',
         dueDate: today,
         pomodoros: 3,
         isCompleted: true,
@@ -98,23 +116,38 @@ class DummyTodos {
       Todo(
         id: '3',
         title: 'Team standup meeting',
+        timePeriod: 'morning',
         dueDate: today,
         pomodoros: 1,
       ),
-      Todo(id: '4', title: 'Fix login bug', dueDate: today, pomodoros: 2),
+      Todo(
+        id: '4',
+        title: 'Fix login bug',
+        timePeriod: 'evening',
+        dueDate: today,
+        pomodoros: 2,
+      ),
       Todo(
         id: '5',
         title: 'Design review session',
+        timePeriod: 'afternoon',
         dueDate: tomorrow,
         pomodoros: 2,
       ),
       Todo(
         id: '6',
         title: 'Update dependencies',
+        timePeriod: 'evening',
         dueDate: tomorrow,
         pomodoros: 1,
       ),
-      Todo(id: '7', title: 'Write unit tests', dueDate: tomorrow, pomodoros: 4),
+      Todo(
+        id: '7',
+        title: 'Write unit tests',
+        timePeriod: 'morning',
+        dueDate: tomorrow,
+        pomodoros: 4,
+      ),
     ];
   }
 
