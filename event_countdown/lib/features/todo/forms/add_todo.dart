@@ -1,9 +1,11 @@
-import 'package:event_countdown/models/todo_model.dart';
+import 'package:event_countdown/features/models/todo_model.dart';
 import 'package:event_countdown/features/todo/services/todo_service.dart';
 import 'package:flutter/material.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
-  const AddTaskBottomSheet({super.key});
+  final DateTime theDate;
+
+  const AddTaskBottomSheet({super.key, required this.theDate});
 
   @override
   State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
@@ -11,7 +13,7 @@ class AddTaskBottomSheet extends StatefulWidget {
 
 class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   final _taskNameController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
+
   String _selectedTimePeriod = 'Morning';
   final List<String> _timePeriods = [
     'Morning', // fajr to dhur
@@ -28,13 +30,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     super.dispose();
   }
 
-  void _selectDate(DateTime date) {
-    setState(() {
-      _selectedDate = date;
-    });
-  }
-
-  void _addTask() async {
+  Future<void> _addTask() async {
     // Validate input
     if (_taskNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -51,7 +47,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     try {
       final success = await TodoService().addTodo(
         title: _taskNameController.text.trim(),
-        dueDate: _selectedDate,
+        dueDate: widget.theDate,
         timePeriod: _selectedTimePeriod,
       );
 
@@ -59,15 +55,15 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
       if (success) {
         final newTodo = Todo(
-          id: '', // Server assigns id; list will refetch and show real id
+          id: '',
           title: _taskNameController.text.trim(),
-          dueDate: _selectedDate,
+          dueDate: widget.theDate,
           timePeriod: _selectedTimePeriod,
         );
-        Navigator.of(context).pop(newTodo);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Task created successfully')),
         );
+        Navigator.of(context).pop(newTodo);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -154,46 +150,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
             ),
           ),
 
-          // Date selection section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Due Date',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Quick date options
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDateOption(
-                        theme,
-                        'Today',
-                        DateTime.now(),
-                        _selectedDate,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildDateOption(
-                        theme,
-                        'Tomorrow',
-                        DateTime.now().add(const Duration(days: 1)),
-                        _selectedDate,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+      
 
           DropdownButton<String>(
             value: _selectedTimePeriod,
@@ -276,47 +233,6 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
           // Bottom safe area
           SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDateOption(
-    ThemeData theme,
-    String label,
-    DateTime date,
-    DateTime selectedDate,
-  ) {
-    final isSelected =
-        DateTime(date.year, date.month, date.day) ==
-        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-
-    return InkWell(
-      onTap: () => _selectDate(date),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: 0.1)
-              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withValues(alpha: 0.3),
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.onSurface,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
       ),
     );
   }

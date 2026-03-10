@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/core/service/auth_service.dart';
-import 'package:event_countdown/models/pomdoro_model.dart';
+import 'package:event_countdown/features/models/pomdoro_model.dart';
 
 /// Service class for handling all Pomodoro-related API operations.
 /// Backend uses a single-table design; all requests require the current user's id (Cognito sub).
@@ -101,7 +101,139 @@ class PomodoroService {
     }
   }
 
-   Future<void> startPomodoro(String pomodoroId) async {}
-   Future<void> stopPomodoro(String pomodoroId) async {}
+  /// Starts the timer for a pomodoro by saving a startedAt timestamp in the DB.
+  /// Returns the server-assigned [startedAt] DateTime on success.
+  Future<DateTime?> startPomodoro({
+    required String pomodoroId,
+    required String todoId,
+  }) async {
+    try {
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
+      if (token == null || userId == null) return null;
 
+      final response = await Amplify.API
+          .put(
+            _pomodorosEndpoint,
+            apiName: _apiName,
+            body: HttpPayload.json({
+              'userId': userId,
+              'todoId': todoId,
+              'pomodoroId': pomodoroId,
+              'action': 'start',
+            }),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .response;
+
+      if (response.statusCode != 200) {
+        safePrint('Start pomodoro failed: ${response.statusCode}');
+        return null;
+      }
+
+      final body = jsonDecode(response.decodeBody()) as Map<String, dynamic>;
+      return DateTime.parse(body['startedAt'] as String);
+    } catch (e) {
+      safePrint('Error starting pomodoro: $e');
+      return null;
+    }
+  }
+
+  /// Pauses a running pomodoro. The server accumulates elapsed time and clears
+  /// startedAt. Returns the new total [elapsedSeconds], or null on failure.
+  Future<int?> pausePomodoro({
+    required String pomodoroId,
+    required String todoId,
+  }) async {
+    try {
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
+      if (token == null || userId == null) return null;
+
+      final response = await Amplify.API
+          .put(
+            _pomodorosEndpoint,
+            apiName: _apiName,
+            body: HttpPayload.json({
+              'userId': userId,
+              'todoId': todoId,
+              'pomodoroId': pomodoroId,
+              'action': 'pause',
+            }),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .response;
+
+      if (response.statusCode != 200) return null;
+
+      final body = jsonDecode(response.decodeBody()) as Map<String, dynamic>;
+      return (body['elapsedSeconds'] as num).toInt();
+    } catch (e) {
+      safePrint('Error pausing pomodoro: $e');
+      return null;
+    }
+  }
+
+  /// Resets a pomodoro back to its initial state: clears startedAt,
+  /// sets elapsedSeconds to 0, and sets status to "stopped".
+  Future<bool> resetPomodoro({
+    required String pomodoroId,
+    required String todoId,
+  }) async {
+    try {
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
+      if (token == null || userId == null) return false;
+
+      final response = await Amplify.API
+          .put(
+            _pomodorosEndpoint,
+            apiName: _apiName,
+            body: HttpPayload.json({
+              'userId': userId,
+              'todoId': todoId,
+              'pomodoroId': pomodoroId,
+              'action': 'reset',
+            }),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .response;
+
+      return response.statusCode == 200;
+    } catch (e) {
+      safePrint('Error resetting pomodoro: $e');
+      return false;
+    }
+  }
+
+  /// Marks a pomodoro as completed in the DB.
+  Future<bool> completePomodoro({
+    required String pomodoroId,
+    required String todoId,
+  }) async {
+    try {
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
+      if (token == null || userId == null) return false;
+
+      final response = await Amplify.API
+          .put(
+            _pomodorosEndpoint,
+            apiName: _apiName,
+            body: HttpPayload.json({
+              'userId': userId,
+              'todoId': todoId,
+              'pomodoroId': pomodoroId,
+              'action': 'complete',
+            }),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .response;
+
+      return response.statusCode == 200;
+    } catch (e) {
+      safePrint('Error completing pomodoro: $e');
+      return false;
+    }
+  }
 }

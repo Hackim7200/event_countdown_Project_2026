@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/core/service/auth_service.dart';
-import 'package:event_countdown/models/event_model.dart';
+import 'package:event_countdown/features/models/event_model.dart';
 
 /// Service class for handling all Event-related API operations.
 /// Backend uses a single-table design; all requests require the current user's id (Cognito sub).

@@ -1,5 +1,5 @@
 import 'package:event_countdown/core/app_icons.dart';
-import 'package:event_countdown/models/event_model.dart';
+import 'package:event_countdown/features/models/event_model.dart';
 import 'package:flutter/material.dart';
 
 class EventCard extends StatelessWidget {

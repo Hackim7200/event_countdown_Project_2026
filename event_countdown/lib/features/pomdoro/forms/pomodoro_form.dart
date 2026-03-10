@@ -1,4 +1,4 @@
-import 'package:event_countdown/models/pomdoro_model.dart';
+import 'package:event_countdown/features/models/pomdoro_model.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
 import 'package:flutter/material.dart';
 
@@ -21,11 +21,9 @@ class AddPomodoroBottomSheet extends StatefulWidget {
 }
 
 class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
-  static const int _defaultDurationMinutes = 25;
-  static const List<int> _durationOptions = [15, 25, 45];
+  static const int _durationMinutes = 25;
   final _taskNameController = TextEditingController();
 
-  int _durationMinutes = _defaultDurationMinutes;
   bool _isLoading = false;
 
   @override
@@ -34,7 +32,7 @@ class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
     super.dispose();
   }
 
-  void _addPomodoro() async {
+  Future<void> _addPomodoro() async {
     final title = _taskNameController.text.trim();
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -61,13 +59,13 @@ class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
         final session = Pomodoro(
           id: newId,
           title: title,
-          completed: false,
+          status: 'stopped',
           timerDurationInMinutes: _durationMinutes,
         );
-        Navigator.of(context).pop(session);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pomodoro session started')),
+          const SnackBar(content: Text('Pomodoro session created')),
         );
+        Navigator.of(context).pop(session);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -153,42 +151,6 @@ class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
             ),
           ),
 
-          // Duration section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Duration',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: _durationOptions.map((minutes) {
-                    final isSelected = _durationMinutes == minutes;
-                    return Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          right: minutes != _durationOptions.last ? 8 : 0,
-                        ),
-                        child: _buildDurationOption(
-                          theme,
-                          '$minutes min',
-                          minutes,
-                          isSelected,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-
           // Action buttons
           Padding(
             padding: const EdgeInsets.all(24),
@@ -251,43 +213,6 @@ class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
           // Bottom safe area
           SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDurationOption(
-    ThemeData theme,
-    String label,
-    int minutes,
-    bool isSelected,
-  ) {
-    return InkWell(
-      onTap: () => setState(() => _durationMinutes = minutes),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: 0.1)
-              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
-          border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withValues(alpha: 0.3),
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.onSurface,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
       ),
     );
   }

@@ -1,4 +1,4 @@
-import 'package:event_countdown/models/todo_model.dart';
+import 'package:event_countdown/features/models/todo_model.dart';
 import 'package:flutter/material.dart';
 
 class TodoCard extends StatelessWidget {

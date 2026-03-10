@@ -1,7 +1,8 @@
+import 'package:event_countdown/core/service/prayer_times_service.dart';
 import 'package:event_countdown/features/todo/sortTodos.dart';
-import 'package:event_countdown/models/todo_model.dart';
+import 'package:event_countdown/features/models/todo_model.dart';
 import 'package:event_countdown/features/pomdoro/pomdoro_screen.dart';
-import 'package:event_countdown/features/pomdoro/pomdoro_screen_2.dart';
+import 'package:event_countdown/features/todo/forms/add_todo.dart';
 import 'package:event_countdown/features/todo/services/todo_service.dart';
 import 'package:event_countdown/features/todo/widgets/todo_card.dart';
 import 'package:event_countdown/features/todo/widgets/period_countdown_text.dart';
@@ -16,6 +17,7 @@ class TodaySection extends StatefulWidget {
 
 class _TodaySectionState extends State<TodaySection> {
   final _todoService = TodoService();
+  final _prayerTimesService = PrayerTimesService();
   List<Todo> _todos = [];
 
   List<Todo> _morningTodos = [];
@@ -24,15 +26,10 @@ class _TodaySectionState extends State<TodaySection> {
   List<Todo> _twilightTodos = [];
   List<Todo> _nightTodos = [];
 
-  /// Prayer times in decimal hours (e.g. 5.09 = 5:05, 12.44 = 12:44).
-  /// Order: [0] Fajr, [1] Dhuhr, [2] Asr, [3] Maghrib, [4] Isha.
-  static const List<double> _dummySalahTimes = [
-    5.09,
-    12.44,
-    15.18,
-    17.46,
-    19.05,
-  ];
+  /// Salah times in decimal hours: [Fajr, Dhuhr, Asr, Maghrib, Isha].
+  /// Populated from the Aladhan API on load.
+  List<double> _salahTimes = [];
+
   static const List<String> _periodNames = [
     'Morning',
     'Early Afternoon',
@@ -41,13 +38,6 @@ class _TodaySectionState extends State<TodaySection> {
     'Night',
   ];
 
-  // final List<String> _timePeriods = [
-  //   'Morning', // fajr to dhur
-  //   'Early Afternoon', // dhur to asr
-  //   'Late Afternoon', // asr to maghrib
-  //   'Twilight', // maghrib to isha
-  //   'Night', // isha to fajr
-  // ];
   bool _isLoading = true;
   String? _error;
 
@@ -65,7 +55,12 @@ class _TodaySectionState extends State<TodaySection> {
 
     try {
       final now = DateTime.now();
-      final todayTodos = await _todoService.getTodos(forDate: now);
+      final results = await Future.wait([
+        _todoService.getTodos(forDate: now),
+        _prayerTimesService.getSalahTimes(date: now),
+      ]);
+      final todayTodos = results[0] as List<Todo>;
+      _salahTimes = results[1] as List<double>;
 
       if (mounted) {
         final morning = FilterByPeriod.filterByPeriod(todayTodos, 'Morning');
@@ -104,33 +99,37 @@ class _TodaySectionState extends State<TodaySection> {
     await _loadTodos();
   }
 
-  /// Current time as decimal hours (e.g. 14:30 -> 14.5).
+  Future<void> _openAddTodoSheet() async {
+    final result = await showModalBottomSheet<Todo?>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddTaskBottomSheet(theDate: DateTime.now()),
+    );
+
+    if (!mounted) return;
+    if (result != null) {
+      await _loadTodos();
+    }
+  }
+
   double _currentTimeAsDecimal() {
     final now = DateTime.now();
     return now.hour + now.minute / 60.0 + now.second / 3600.0;
   }
 
-  /// Converts HH.MM format (e.g. 12.44 = 12:44) to decimal hours.
-  double _salahTimeToDecimalHours(double hhMm) {
-    final h = hhMm.floor();
-    final m = ((hhMm - h) * 100).round().clamp(0, 99);
-    return h + m / 60.0;
-  }
-
   /// End time of period [index] in decimal hours (next prayer).
   /// Night (index 4) ends at Fajr next day, so +24.
   double _periodEndTime(int index) {
-    final s = _dummySalahTimes.map(_salahTimeToDecimalHours).toList();
-    if (index < 4) return s[index + 1];
-    return s[0] + 24.0; // Night ends at Fajr next day
+    if (index < 4) return _salahTimes[index + 1];
+    return _salahTimes[0] + 24.0;
   }
 
-  /// Active period based on current time within [_dummySalahTimes] windows:
-  /// [0]-[1] Morning, [1]-[2] Early Afternoon, [2]-[3] Late Afternoon,
-  /// [3]-[4] Twilight, [4] to [0] next day Night.
+  /// Active period based on current time within fetched salah time windows.
   String _getActiveTimePeriodFromSalahTimes() {
     final t = _currentTimeAsDecimal();
-    final s = _dummySalahTimes.map(_salahTimeToDecimalHours).toList();
+    final s = _salahTimes;
+    if (s.isEmpty) return _periodNames[0];
     if (t >= s[0] && t < s[1]) return _periodNames[0]; // Morning
     if (t >= s[1] && t < s[2]) return _periodNames[1]; // Early Afternoon
     if (t >= s[2] && t < s[3]) return _periodNames[2]; // Late Afternoon
@@ -175,6 +174,16 @@ class _TodaySectionState extends State<TodaySection> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddTodoSheet,
+        child: const Icon(Icons.add),
+      ),
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -302,7 +311,7 @@ class _TodaySectionState extends State<TodaySection> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PomodoroScreen2(todoId: id, title: title),
+        builder: (context) => PomodoroScreen(todoId: id, title: title),
       ),
     );
   }

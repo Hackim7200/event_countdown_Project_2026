@@ -1,40 +1,321 @@
+import 'dart:async';
+
+import 'package:event_countdown/features/models/pomdoro_model.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
-import 'package:event_countdown/models/pomdoro_model.dart';
 import 'package:flutter/material.dart';
 
-/// Displays a single pomodoro session (title and duration).
-class PomodoroTile extends StatelessWidget {
-  const PomodoroTile({super.key, required this.pomodoro});
+/// Displays a single pomodoro session with a live countdown driven by the
+/// server-side [startedAt] timestamp.
+///
+/// When the user taps "Start", the service writes a timestamp to DynamoDB.
+/// A local ticker recalculates remaining = duration - (now - startedAt) every
+/// second. If the app is reopened while the timer is running the countdown
+/// automatically resumes because elapsed is derived from the persisted timestamp.
+class PomodoroTile extends StatefulWidget {
+  const PomodoroTile({
+    super.key,
+    required this.pomodoro,
+    required this.todoId,
+    this.onCompleted,
+  });
 
   final Pomodoro pomodoro;
+  final String todoId;
+
+  /// Called after the pomodoro is marked completed in the backend.
+  final VoidCallback? onCompleted;
+
   @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        PomodoroService().startPomodoro(pomodoro.id);
-        PomodoroService().stopPomodoro(pomodoro.id);
-      },
-      leading: Icon(
-        Icons.circle,
-        size: 40,
-        color: const Color.fromARGB(255, 249, 130, 130),
-      ),
-      title: Text(pomodoro.title),
-      subtitle: Text(
-        '${pomodoro.timerDurationInMinutes} min',
-        style: Theme.of(context).textTheme.bodySmall,
-      ),
-      trailing: Text("12min left"),
+  State<PomodoroTile> createState() => _PomodoroTileState();
+}
+
+class _PomodoroTileState extends State<PomodoroTile> {
+  final _service = PomodoroService();
+
+  late Pomodoro _pomodoro;
+  Timer? _ticker;
+  Duration _remaining = Duration.zero;
+  bool _isStarting = false;
+  bool _isPausing = false;
+  bool _isResetting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pomodoro = widget.pomodoro;
+    _syncTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant PomodoroTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pomodoro.id != widget.pomodoro.id ||
+        oldWidget.pomodoro.startedAt != widget.pomodoro.startedAt ||
+        oldWidget.pomodoro.status != widget.pomodoro.status) {
+      _pomodoro = widget.pomodoro;
+      _syncTimer();
+    }
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  /// Start or resume the local ticker based on the current model state.
+  void _syncTimer() {
+    _ticker?.cancel();
+    _ticker = null;
+
+    if (_pomodoro.isCompleted) {
+      _remaining = Duration.zero;
+      return;
+    }
+
+    if (_pomodoro.startedAt == null) {
+      _remaining = _pomodoro.remaining;
+      return;
+    }
+
+    _remaining = _pomodoro.remaining;
+    if (_remaining <= Duration.zero) {
+      _markCompleted();
+      return;
+    }
+
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final left = _pomodoro.remaining;
+      setState(() => _remaining = left);
+      if (left <= Duration.zero) {
+        _ticker?.cancel();
+        _ticker = null;
+        _markCompleted();
+      }
+    });
+  }
+
+  Future<void> _handleStart() async {
+    setState(() => _isStarting = true);
+    final startedAt = await _service.startPomodoro(
+      pomodoroId: _pomodoro.id,
+      todoId: widget.todoId,
+    );
+    if (!mounted) return;
+
+    if (startedAt != null) {
+      setState(() {
+        _pomodoro = _pomodoro.copyWith(startedAt: startedAt, status: 'running');
+        _isStarting = false;
+      });
+      _syncTimer();
+    } else {
+      setState(() => _isStarting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to start timer. Try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handlePause() async {
+    setState(() => _isPausing = true);
+    final newElapsed = await _service.pausePomodoro(
+      pomodoroId: _pomodoro.id,
+      todoId: widget.todoId,
+    );
+    if (!mounted) return;
+
+    if (newElapsed != null) {
+      _ticker?.cancel();
+      _ticker = null;
+      setState(() {
+        _pomodoro = _pomodoro.copyWith(
+          clearStartedAt: true,
+          elapsedSeconds: newElapsed,
+          status: 'stopped',
+        );
+        _remaining = _pomodoro.remaining;
+        _isPausing = false;
+      });
+    } else {
+      setState(() => _isPausing = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to pause timer. Try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleReset() async {
+    setState(() => _isResetting = true);
+    final success = await _service.resetPomodoro(
+      pomodoroId: _pomodoro.id,
+      todoId: widget.todoId,
+    );
+    if (!mounted) return;
+
+    if (success) {
+      _ticker?.cancel();
+      _ticker = null;
+      setState(() {
+        _pomodoro = _pomodoro.copyWith(
+          clearStartedAt: true,
+          elapsedSeconds: 0,
+          status: 'stopped',
+        );
+        _remaining = _pomodoro.totalDuration;
+        _isResetting = false;
+      });
+    } else {
+      setState(() => _isResetting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to reset timer. Try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _markCompleted() async {
+    final success = await _service.completePomodoro(
+      pomodoroId: _pomodoro.id,
+      todoId: widget.todoId,
+    );
+    if (!mounted) return;
+    if (success) {
+      setState(() {
+        _pomodoro = _pomodoro.copyWith(status: 'completed');
+        _remaining = Duration.zero;
+      });
+      widget.onCompleted?.call();
+    }
+  }
+
+  static String _formatDuration(Duration d) {
+    final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  Widget _buildLoadingIndicator() {
+    return const SizedBox(
+      width: 24,
+      height: 24,
+      child: CircularProgressIndicator(strokeWidth: 2),
     );
   }
-  double (Pomodoro pomodoro) {
 
-
-
-
-
-
-
+  Widget? _buildTrailing({
+    required bool notStarted,
+    required bool isRunning,
+    required bool isStopped,
+  }) {
+    if (notStarted) {
+      return _isStarting
+          ? _buildLoadingIndicator()
+          : IconButton(
+              icon: const Icon(Icons.play_arrow),
+              onPressed: _handleStart,
+            );
+    }
+    if (isStopped) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _isStarting
+              ? _buildLoadingIndicator()
+              : IconButton(
+                  icon: const Icon(Icons.play_arrow),
+                  onPressed: _handleStart,
+                ),
+          _isResetting
+              ? _buildLoadingIndicator()
+              : IconButton(
+                  icon: const Icon(Icons.restart_alt),
+                  onPressed: _handleReset,
+                ),
+        ],
+      );
+    }
+    if (isRunning) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _isPausing
+              ? _buildLoadingIndicator()
+              : IconButton(
+                  icon: const Icon(Icons.pause),
+                  onPressed: _handlePause,
+                ),
+          _isResetting
+              ? _buildLoadingIndicator()
+              : IconButton(
+                  icon: const Icon(Icons.restart_alt),
+                  onPressed: _handleReset,
+                ),
+        ],
+      );
+    }
+    return null;
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isRunning = _pomodoro.isRunning;
+    final isStopped = _pomodoro.isStopped;
+    final isCompleted = _pomodoro.isCompleted;
+    final notStarted = isStopped && _pomodoro.elapsedSeconds == 0;
+
+    final IconData icon;
+    final Color iconColor;
+    if (isCompleted) {
+      icon = Icons.check_circle;
+      iconColor = Colors.green;
+    } else if (isRunning) {
+      icon = Icons.timer;
+      iconColor = theme.colorScheme.primary;
+    } else if (isStopped && _pomodoro.elapsedSeconds > 0) {
+      icon = Icons.pause_circle;
+      iconColor = Colors.orange;
+    } else {
+      icon = Icons.circle_outlined;
+      iconColor = const Color.fromARGB(255, 249, 130, 130);
+    }
+
+    final String subtitle;
+    if (isCompleted) {
+      subtitle = 'Completed';
+    } else if (isRunning) {
+      subtitle = '${_formatDuration(_remaining)} remaining';
+    } else if (isStopped && _pomodoro.elapsedSeconds > 0) {
+      subtitle = '${_formatDuration(_remaining)} remaining · Paused';
+    } else {
+      subtitle = '${_pomodoro.timerDurationInMinutes} min';
+    }
+
+    return ListTile(
+      leading: Icon(icon, size: 40, color: iconColor),
+      title: Text(_pomodoro.title),
+      subtitle: Text(subtitle, style: theme.textTheme.bodySmall),
+      trailing: _buildTrailing(
+        notStarted: notStarted,
+        isRunning: isRunning,
+        isStopped: isStopped,
+      ),
+    );
+  }
 }

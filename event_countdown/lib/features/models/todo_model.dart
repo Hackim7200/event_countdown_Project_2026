@@ -18,7 +18,7 @@ class Todo {
     required this.timePeriod,
     this.isCompleted = false,
     required this.dueDate,
-    this.pomodoros = 1,
+    this.pomodoros = 0,
   });
 
   /// Creates a [Todo] instance from a JSON map.
