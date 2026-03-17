@@ -1,5 +1,5 @@
 import 'package:event_countdown/core/service/prayer_times_service.dart';
-import 'package:event_countdown/features/todo/sortTodos.dart';
+import 'package:event_countdown/features/todo/sort_todos.dart';
 import 'package:event_countdown/features/models/todo_model.dart';
 import 'package:event_countdown/features/pomdoro/pomdoro_screen.dart';
 import 'package:event_countdown/features/todo/forms/add_todo.dart';
@@ -307,15 +307,6 @@ class _TodaySectionState extends State<TodaySection> {
     );
   }
 
-  void _navigateToPomodoro(String id, String title) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PomodoroScreen(todoId: id, title: title),
-      ),
-    );
-  }
-
   /// Returns a suitable icon for the given time period.
   IconData _iconForPeriod(String timePeriod) {
     switch (timePeriod) {
@@ -402,8 +393,34 @@ class _TodaySectionState extends State<TodaySection> {
               return TodoCard(
                 key: ValueKey(todo.id),
                 pomodoroCount: todo.pomodoros,
+                onDelete: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  final success = await _todoService.deleteTodo(
+                    id: todo.id,
+                    rawDate: todo.rawDate,
+                  );
+                  if (!mounted) return;
+                  if (success) {
+                    await _loadTodos();
+                  } else {
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('Failed to delete todo. Try again.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
                 todo: todo,
-                onTap: () => _navigateToPomodoro(todo.id, todo.title),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PomodoroScreen(todoId: todo.id, title: todo.title),
+                    ),
+                  );
+                },
               );
             },
           ),

@@ -160,7 +160,24 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
             key: ValueKey(pomodoro.id),
             pomodoro: pomodoro,
             todoId: widget.todoId!,
-            onCompleted: _loadPomodoros,
+            onCompleted: _loadPomodoros, // reloads list
+            onDeleted: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final removed = _pomodoros[index];
+              setState(() => _pomodoros.removeAt(index));
+
+              final success = await _pomodoroService.deletePomodoro(
+                pomodoroId: pomodoro.id,
+                todoId: widget.todoId!,
+              );
+
+              if (!success && mounted) {
+                setState(() => _pomodoros.insert(index, removed));
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('Failed to delete pomodoro')),
+                );
+              }
+            },
           );
         },
       ),

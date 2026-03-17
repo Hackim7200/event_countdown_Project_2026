@@ -36,6 +36,7 @@ dependencies:
   flutter_svg: ^2.0.9
   http: ^1.3.0
   font_awesome_flutter: ^10.8.0
+  flutter_launcher_icons: ^0.14.4
 
   # amplify
   amplify_flutter: ^2.0.0
@@ -46,6 +47,13 @@ dependencies:
   # riverpod
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.3.0
+  flutter_slidable: ^4.0.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/logos/pomdoro_planner.png"
 
 dev_dependencies:
   flutter_test:

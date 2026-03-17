@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:event_countdown/features/models/pomdoro_model.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 /// Displays a single pomodoro session with a live countdown driven by the
 /// server-side [startedAt] timestamp.
@@ -17,6 +18,7 @@ class PomodoroTile extends StatefulWidget {
     required this.pomodoro,
     required this.todoId,
     this.onCompleted,
+    this.onDeleted,
   });
 
   final Pomodoro pomodoro;
@@ -24,6 +26,9 @@ class PomodoroTile extends StatefulWidget {
 
   /// Called after the pomodoro is marked completed in the backend.
   final VoidCallback? onCompleted;
+
+  /// Called when the user confirms deletion via swipe.
+  final VoidCallback? onDeleted;
 
   @override
   State<PomodoroTile> createState() => _PomodoroTileState();
@@ -204,6 +209,29 @@ class _PomodoroTileState extends State<PomodoroTile> {
     }
   }
 
+  Future<void> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Pomodoro'),
+        content: const Text('Are you sure you want to delete this session?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      widget.onDeleted?.call();
+    }
+  }
+
   static String _formatDuration(Duration d) {
     final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
@@ -307,14 +335,46 @@ class _PomodoroTileState extends State<PomodoroTile> {
       subtitle = '${_pomodoro.timerDurationInMinutes} min';
     }
 
-    return ListTile(
-      leading: Icon(icon, size: 40, color: iconColor),
-      title: Text(_pomodoro.title),
-      subtitle: Text(subtitle, style: theme.textTheme.bodySmall),
-      trailing: _buildTrailing(
-        notStarted: notStarted,
-        isRunning: isRunning,
-        isStopped: isStopped,
+    return Slidable(
+      key: ValueKey(_pomodoro.id),
+      endActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        children: [
+          if (!isCompleted)
+            SlidableAction(
+              onPressed: (_) => _handleReset(),
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+              icon: Icons.restart_alt,
+              // label: 'Reset',
+            ),
+          if (!isCompleted)
+            SlidableAction(
+              onPressed: (_) => _markCompleted(),
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              icon: Icons.check,
+              // label: 'Complete',
+            ),
+          if (widget.onDeleted != null)
+            SlidableAction(
+              onPressed: (_) => _confirmDelete(),
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              icon: Icons.delete,
+              // label: 'Delete',
+            ),
+        ],
+      ),
+      child: ListTile(
+        leading: Icon(icon, size: 40, color: iconColor),
+        title: Text(_pomodoro.title),
+        subtitle: Text(subtitle, style: theme.textTheme.bodySmall),
+        trailing: _buildTrailing(
+          notStarted: notStarted,
+          isRunning: isRunning,
+          isStopped: isStopped,
+        ),
       ),
     );
   }

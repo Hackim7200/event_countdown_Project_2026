@@ -59,39 +59,40 @@ class TodoService {
     }
   }
 
-  /// Marks a todo as completed.
-  /// Returns true if successful, false otherwise.
-  Future<bool> completeTodo(String id) async {
-    try {
-      final token = await authService.getIdToken();
-      final userId = await authService.getUserId();
-      if (token == null || userId == null) {
-        safePrint('User is not signed in');
-        return false;
-      }
+  //this is not necessary because if the pomodoros are all completed than this can automatically be completed, i.e UI change
+  // /// Marks a todo as completed.
+  // /// Returns true if successful, false otherwise.
+  // Future<bool> completeTodo({required String id}) async {
+  //   try {
+  //     final token = await authService.getIdToken();
+  //     final userId = await authService.getUserId();
+  //     if (token == null || userId == null) {
+  //       safePrint('User is not signed in');
+  //       return false;
+  //     }
 
-      safePrint('Completing todo with id: $id');
+  //     safePrint('Completing todo with id: $id');
 
-      final response = await Amplify.API
-          .put(
-            _todosEndpoint,
-            apiName: _apiName,
-            queryParameters: {'userId': userId, 'id': id},
-            body: HttpPayload.json({'completed': true}),
-            headers: {'Authorization': 'Bearer $token'},
-          )
-          .response;
+  //     final response = await Amplify.API
+  //         .put(
+  //           _todosEndpoint,
+  //           apiName: _apiName,
+  //           queryParameters: {'userId': userId, 'id': id},
+  //           body: HttpPayload.json({'completed': true}),
+  //           headers: {'Authorization': 'Bearer $token'},
+  //         )
+  //         .response;
 
-      safePrint(
-        'Complete todo response (${response.statusCode}): ${response.decodeBody()}',
-      );
+  //     safePrint(
+  //       'Complete todo response (${response.statusCode}): ${response.decodeBody()}',
+  //     );
 
-      return response.statusCode == 200;
-    } catch (e) {
-      safePrint('Error completing todo: $e');
-      return false;
-    }
-  }
+  //     return response.statusCode == 200;
+  //   } catch (e) {
+  //     safePrint('Error completing todo: $e');
+  //     return false;
+  //   }
+  // }
 
   /// Adds a new todo.
   /// Returns true if successful, false if not signed in.
@@ -118,7 +119,7 @@ class TodoService {
               'userId': userId,
               'title': title,
               'completed': false,
-              'date': dueDate.toIso8601String(),
+              'date': dueDate.toIso8601String().split('T')[0],
               'timePeriod': timePeriod,
             }),
             headers: {'Authorization': 'Bearer $token'},
@@ -143,6 +144,38 @@ class TodoService {
       if (e is Exception) rethrow;
       safePrint('Error creating todo: $e');
       throw Exception('Failed to create task: $e');
+    }
+  }
+
+  /// Deletes a todo by [id] and [rawDate].
+  /// [rawDate] must be the exact date string from the backend (used in the DynamoDB SK).
+  /// Returns true if successful, false otherwise.
+  Future<bool> deleteTodo({required String id, required String rawDate}) async {
+    try {
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
+      if (token == null || userId == null) {
+        safePrint('User is not signed in');
+        return false;
+      }
+
+      final response = await Amplify.API
+          .delete(
+            _todosEndpoint,
+            apiName: _apiName,
+            queryParameters: {'userId': userId, 'id': id, 'date': rawDate},
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .response;
+
+      safePrint(
+        'Delete todo response (${response.statusCode}): ${response.decodeBody()}',
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      safePrint('Error deleting todo: $e');
+      return false;
     }
   }
 }

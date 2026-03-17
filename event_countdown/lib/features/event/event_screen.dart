@@ -11,7 +11,6 @@ class EventScreen extends StatefulWidget {
 }
 
 class _EventScreenState extends State<EventScreen> {
-  /// Incremented when an event is added so tab sections refetch from the API.
   int _refreshKey = 0;
 
   Future<void> _openAddEventSheet() async {
@@ -33,6 +32,7 @@ class _EventScreenState extends State<EventScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(title: const Text("Events"), centerTitle: true),
+
         floatingActionButton: FloatingActionButton(
           onPressed: _openAddEventSheet,
           child: const Icon(Icons.add),

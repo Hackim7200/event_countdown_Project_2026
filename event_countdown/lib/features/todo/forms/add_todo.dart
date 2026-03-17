@@ -95,6 +95,8 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
@@ -103,136 +105,155 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
           topRight: Radius.circular(20),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Draggable handle
-          Container(
-            margin: const EdgeInsets.only(top: 12, bottom: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.outline.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // Title
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Text(
-              'Add task',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ),
-
-          // Task name input
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            child: TextField(
-              controller: _taskNameController,
-              decoration: InputDecoration(
-                hintText: 'Task name',
-                filled: true,
-                fillColor: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
+              ),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
                   vertical: 16,
                 ),
+                child: Text(
+                  'Add task',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
               ),
-            ),
-          ),
 
-      
-
-          DropdownButton<String>(
-            value: _selectedTimePeriod,
-            items: _timePeriods
-                .map(
-                  (timePeriod) => DropdownMenuItem<String>(
-                    value: timePeriod,
-                    child: Text(timePeriod),
-                  ),
-                )
-                .toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() => _selectedTimePeriod = value);
-              }
-            },
-          ),
-
-          // Action buttons
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: theme.colorScheme.primary),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
+                child: TextField(
+                  controller: _taskNameController,
+                  decoration: InputDecoration(
+                    hintText: 'Task name',
+                    filled: true,
+                    fillColor: theme.colorScheme.onSurface.withValues(
+                      alpha: 0.05,
                     ),
-                    child: Text(
-                      'Cancel',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+              ),
 
-                // Time period selection section
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _addTask,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _timePeriods.map((timePeriod) {
+                    final isSelected = timePeriod == _selectedTimePeriod;
+                    return ChoiceChip(
+                      label: Text(timePeriod),
+                      selected: isSelected,
+                      onSelected: (_) {
+                        setState(() => _selectedTimePeriod = timePeriod);
+                      },
+                      selectedColor: theme.colorScheme.primary,
+                      labelStyle: TextStyle(
+                        color: isSelected
+                            ? theme.colorScheme.onPrimary
+                            : theme.colorScheme.onSurface,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
-                    ),
-                    child: _isLoading
-                        ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: theme.colorScheme.onPrimary,
-                            ),
-                          )
-                        : Text(
-                            'Add Task',
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              color: theme.colorScheme.onPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      showCheckmark: false,
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _isLoading
+                            ? null
+                            : () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: BorderSide(color: theme.colorScheme.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
 
-          // Bottom safe area
-          SizedBox(height: MediaQuery.of(context).padding.bottom),
-        ],
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _addTask,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.onPrimary,
+                                ),
+                              )
+                            : Text(
+                                'Add Task',
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: theme.colorScheme.onPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
+        ),
       ),
     );
   }

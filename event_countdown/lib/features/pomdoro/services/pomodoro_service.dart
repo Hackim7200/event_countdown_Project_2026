@@ -206,6 +206,44 @@ class PomodoroService {
     }
   }
 
+  /// Deletes a pomodoro session.
+  /// Returns true if successful, false otherwise.
+  Future<bool> deletePomodoro({
+    required String pomodoroId,
+    required String todoId,
+  }) async {
+    try {
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
+      if (token == null || userId == null) return false;
+
+      final response = await Amplify.API
+          .delete(
+            _pomodorosEndpoint,
+            apiName: _apiName,
+            queryParameters: {
+              'userId': userId,
+              'todoId': todoId,
+              'pomodoroId': pomodoroId,
+            },
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .response;
+
+      if (response.statusCode != 200) {
+        safePrint('Delete pomodoro failed: ${response.statusCode}');
+        return false;
+      }
+      return true;
+    } on ApiException catch (e) {
+      safePrint('Delete pomodoro API error: $e');
+      return false;
+    } catch (e) {
+      safePrint('Error deleting pomodoro: $e');
+      return false;
+    }
+  }
+
   /// Marks a pomodoro as completed in the DB.
   Future<bool> completePomodoro({
     required String pomodoroId,

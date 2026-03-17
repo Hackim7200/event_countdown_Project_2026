@@ -93,6 +93,40 @@ class EventService {
     }
   }
 
+  /// Deletes an event by id.
+  /// Returns true if the deletion was successful, false otherwise.
+  Future<bool> deleteEvent(String id) async {
+    try {
+      final token = await authService.getIdToken();
+      final userId = await authService.getUserId();
+      if (token == null || userId == null) {
+        safePrint('User is not signed in');
+        return false;
+      }
+
+      final response = await Amplify.API
+          .delete(
+            _eventsEndpoint,
+            apiName: _apiName,
+            queryParameters: {'userId': userId, 'id': id},
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .response;
+
+      if (response.statusCode != 200) {
+        safePrint('Delete failed with status: ${response.statusCode}');
+        return false;
+      }
+      return true;
+    } on ApiException catch (e) {
+      safePrint('Delete event API error: $e');
+      return false;
+    } catch (e) {
+      safePrint('Error deleting event: $e');
+      return false;
+    }
+  }
+
   /// Adds a new event.
   /// Returns the new event id if successful, null otherwise.
   /// Backend expects [userId], [title], [dueDate], [description], [icon], [location].

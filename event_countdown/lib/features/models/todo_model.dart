@@ -11,6 +11,10 @@ class Todo {
   final int pomodoros;
   final String timePeriod;
 
+  /// The raw date string exactly as returned by the backend.
+  /// Used to construct the DynamoDB SK for delete/update operations.
+  final String rawDate;
+
   /// Main constructor for [Todo].
   const Todo({
     required this.id,
@@ -19,6 +23,7 @@ class Todo {
     this.isCompleted = false,
     required this.dueDate,
     this.pomodoros = 0,
+    this.rawDate = '',
   });
 
   /// Creates a [Todo] instance from a JSON map.
@@ -26,15 +31,14 @@ class Todo {
   /// Accepts either `date` or `dueDate` fields from backend.
   /// Defaults [isCompleted] to false and [pomodoros] to 0 if missing.
   factory Todo.fromJson(Map<String, dynamic> json) {
-    final dateStr = json['date'] ?? json['dueDate'];
+    final dateStr = (json['date'] ?? json['dueDate']) as String?;
     return Todo(
       id: json['id'] as String,
       title: json['title'] as String,
       timePeriod: json['timePeriod'] as String? ?? '',
       isCompleted: json['completed'] as bool? ?? false,
-      dueDate: dateStr != null
-          ? DateTime.parse(dateStr as String)
-          : DateTime.now(),
+      dueDate: dateStr != null ? DateTime.parse(dateStr) : DateTime.now(),
+      rawDate: dateStr ?? '',
       pomodoros: json['pomodoros'] as int? ?? 0,
     );
   }
@@ -75,6 +79,7 @@ class Todo {
     bool? isCompleted,
     DateTime? dueDate,
     int? pomodoros,
+    String? rawDate,
   }) {
     return Todo(
       id: id ?? this.id,
@@ -83,6 +88,7 @@ class Todo {
       isCompleted: isCompleted ?? this.isCompleted,
       dueDate: dueDate ?? this.dueDate,
       pomodoros: pomodoros ?? this.pomodoros,
+      rawDate: rawDate ?? this.rawDate,
     );
   }
 }

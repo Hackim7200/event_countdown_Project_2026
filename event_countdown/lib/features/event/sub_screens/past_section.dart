@@ -34,6 +34,19 @@ class _PastSectionState extends State<PastSection> {
     }
   }
 
+  Future<void> _deleteEvent(String id, int index) async {
+    final removed = _pastEvents[index];
+    setState(() => _pastEvents.removeAt(index));
+
+    final success = await _eventService.deleteEvent(id);
+    if (!success && mounted) {
+      setState(() => _pastEvents.insert(index, removed));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete event')),
+      );
+    }
+  }
+
   Future<void> _refresh() async {
     setState(() {
       _isLoading = true;
@@ -79,7 +92,11 @@ class _PastSectionState extends State<PastSection> {
         itemCount: _pastEvents.length,
         itemBuilder: (context, index) {
           final event = _pastEvents[index];
-          return EventCard(key: ValueKey(event.id), event: event);
+          return EventCard(
+            key: ValueKey(event.id),
+            event: event,
+            onDelete: () => _deleteEvent(event.id, index),
+          );
         },
       ),
     );

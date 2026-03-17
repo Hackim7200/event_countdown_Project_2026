@@ -1,0 +1,6 @@
+1:"$Sreact.fragment"
+2:I[65759,["/_next/static/chunks/b469930e0ad99e7d.js","/_next/static/chunks/a45badd6e5847cf5.js"],"ViewportBoundary"]
+3:I[65759,["/_next/static/chunks/b469930e0ad99e7d.js","/_next/static/chunks/a45badd6e5847cf5.js"],"MetadataBoundary"]
+4:"$Sreact.suspense"
+5:I[7081,["/_next/static/chunks/b469930e0ad99e7d.js","/_next/static/chunks/a45badd6e5847cf5.js"],"IconMark"]
+0:{"buildId":"XWuruuKpaubUO6xrDGmtx","rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Pomodoro Planner"}],["$","meta","1",{"name":"description","content":"Track your todos, events, and pomodoro sessions"}],["$","link","2",{"rel":"icon","href":"/favicon.ico?favicon.0b3bf435.ico","sizes":"256x256","type":"image/x-icon"}],["$","$L5","3",{}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"loading":null,"isPartial":false}
