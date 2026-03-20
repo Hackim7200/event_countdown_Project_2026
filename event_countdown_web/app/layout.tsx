@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,15 +13,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/** Canonical origin for metadata (Open Graph, Twitter cards, absolute URLs). */
+const siteUrl = "https://arkun.co.uk";
+
 export const metadata: Metadata = {
-  title: "Event Countdown",
-  description: "Track your most important events and count down to what matters.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Pomodoro Planner",
+    template: "%s · Pomodoro Planner",
+  },
+  description: "Todos, events, and privacy.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html
