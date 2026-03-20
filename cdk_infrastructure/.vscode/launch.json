@@ -1,0 +1,18 @@
+{
+  // these variables are used to communicate with aws services
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug local file",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": ["${relativeFile}"],
+      "env": {
+        "AWS_REGION": "eu-west-2",
+        "TABLE_NAME": "SpacesTable-026c60252c2f"
+      }
+    }
+  ]
+}

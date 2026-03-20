@@ -1,0 +1,16 @@
+The database has the following field
+
+
+
+TODO / EVENT item fields
+-----------------------
+PK
+SK
+entityType
+title
+date
+completed   
+description 
+
+
+

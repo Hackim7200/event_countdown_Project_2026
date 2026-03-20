@@ -1,0 +1,20 @@
+{
+  "CountdownApp-DataStack": {
+    "ExportsOutputRefUserItemsTableA40148DD201ADF08": "UserItemsTable-02bffbf04063",
+    "ExportsOutputFnGetAttUserItemsTableA40148DDArnA7FA6416": "arn:aws:dynamodb:eu-west-2:759135634975:table/UserItemsTable-02bffbf04063"
+  },
+  "CountdownApp-AuthStack": {
+    "CountdownIdentityPoolId": "eu-west-2:929320cb-7d2d-4224-be7d-b00c0bd67bce",
+    "UserPoolId": "eu-west-2_w5Od4ZXYY",
+    "ExportsOutputFnGetAttCountdownUserPoolFB40AE01ArnB155B27F": "arn:aws:cognito-idp:eu-west-2:759135634975:userpool/eu-west-2_w5Od4ZXYY",
+    "CountdownUserPoolClientId": "4soqgdm7niv8tjdasblg60k351"
+  },
+  "CountdownApp-LambdaStack": {
+    "ExportsOutputFnGetAttPomodorosLambda3204FBCEArnA1CF40DF": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-PomodorosLambda3204FBCE-OijY7rJxevru",
+    "ExportsOutputFnGetAttEventsLambdaE6050439Arn4DABAABB": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-EventsLambdaE6050439-rskgNX41Uv0I",
+    "ExportsOutputFnGetAttTodosLambdaD044F98AArn54AE6F97": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-TodosLambdaD044F98A-9Secinee0uQr"
+  },
+  "CountdownApp-ApiStack": {
+    "CountdownApiEndpoint7FAEED7E": "https://vzf3si0iob.execute-api.eu-west-2.amazonaws.com/prod/"
+  }
+}

@@ -1,0 +1,624 @@
+# AWS CDK TypeScript Infrastructure Project Rules
+
+## Project Structure
+
+This is an AWS CDK infrastructure project with the following structure:
+
+- `/infra` - CDK infrastructure code (stacks, launcher, utilities)
+- `/services` - Lambda function handlers and business logic
+
+## TypeScript & Code Style
+
+### General
+
+- Use TypeScript strict mode
+- Prefer `const` over `let`, avoid `var`
+- Use explicit types for function parameters and return values
+- Use interfaces over type aliases for object shapes
+- Enable ESLint and follow Airbnb TypeScript style guide
+
+### Naming Conventions
+
+- **Stacks**: PascalCase ending with `Stack` (e.g., `ApiStack`, `AuthStack`)
+- **Lambda handlers**: camelCase with descriptive names (e.g., `GetMovies.ts`, `PostMovies.ts`)
+- **Utilities**: PascalCase for classes, camelCase for functions
+- **Resources**: Use descriptive IDs that include the resource type (e.g., `MoviesTable`, `GetMoviesFunction`)
+
+## Code Readability & Simplicity
+
+### Core Principles
+
+- **Prioritize clarity over cleverness** - Write code that any developer can understand at first glance
+- **Simplicity over complexity** - Choose the straightforward solution unless there's a compelling reason for complexity
+- **Self-documenting code** - Variable and function names should explain what they do without needing comments
+- **One thing well** - Functions and classes should have a single, clear responsibility
+
+### Readability Guidelines
+
+#### Descriptive Naming
+
+```typescript
+// ❌ Bad - Cryptic abbreviations
+const tbl = new dynamodb.Table(this, "MT", {});
+const fn = (d: any) => d.id;
+
+// ✅ Good - Clear, descriptive names
+const moviesTable = new dynamodb.Table(this, "MoviesTable", {});
+const extractMovieId = (movie: Movie) => movie.id;
+```
+
+#### Small, Focused Functions
+
+```typescript
+// ❌ Bad - One massive function doing everything
+const processMovie = (data: any) => {
+  // 100 lines of validation, transformation, database calls, etc.
+};
+
+// ✅ Good - Break into smaller, named functions
+const validateMovieData = (data: unknown): Movie => {
+  /* ... */
+};
+const saveMovieToDatabase = (movie: Movie): Promise<void> => {
+  /* ... */
+};
+const notifyMovieCreated = (movieId: string): Promise<void> => {
+  /* ... */
+};
+
+const processMovie = async (data: unknown) => {
+  const movie = validateMovieData(data);
+  await saveMovieToDatabase(movie);
+  await notifyMovieCreated(movie.id);
+};
+```
+
+#### Avoid Deep Nesting
+
+```typescript
+// ❌ Bad - Hard to follow nested logic
+if (user) {
+  if (user.isActive) {
+    if (user.permissions.includes("write")) {
+      if (data.isValid) {
+        // Do something
+      }
+    }
+  }
+}
+
+// ✅ Good - Early returns for clarity
+if (!user) return;
+if (!user.isActive) return;
+if (!user.permissions.includes("write")) return;
+if (!data.isValid) return;
+
+// Do something
+```
+
+#### Clear Variable Names Over Comments
+
+```typescript
+// ❌ Bad - Needs comment to explain
+const t = 1000 * 60 * 5; // 5 minutes in milliseconds
+
+// ✅ Good - Self-explanatory
+const FIVE_MINUTES_IN_MS = 1000 * 60 * 5;
+const lambdaTimeout = Duration.minutes(5);
+```
+
+#### Simple Conditionals
+
+```typescript
+// ❌ Bad - Complex ternary
+const msg = user
+  ? user.verified
+    ? user.premium
+      ? "Premium"
+      : "Standard"
+    : "Unverified"
+  : "Guest";
+
+// ✅ Good - Clear if/else or separate function
+const getUserLabel = (user?: User): string => {
+  if (!user) return "Guest";
+  if (!user.verified) return "Unverified";
+  return user.premium ? "Premium" : "Standard";
+};
+```
+
+#### Explicit Over Implicit
+
+```typescript
+// ❌ Bad - Magic numbers and unclear logic
+if (status === 2 && retries < 3) {
+  /* ... */
+}
+
+// ✅ Good - Named constants and clear intent
+const STATUS_PROCESSING = 2;
+const MAX_RETRIES = 3;
+
+if (status === STATUS_PROCESSING && retries < MAX_RETRIES) {
+  /* ... */
+}
+```
+
+### Infrastructure Code Simplicity
+
+#### Group Related Resources
+
+```typescript
+// ✅ Good - Related resources together with clear sections
+export class ApiStack extends Stack {
+  constructor(scope: Construct, id: string, props: ApiStackProps) {
+    super(scope, id, props);
+
+    // API Gateway
+    const api = this.createApi();
+
+    // Lambda Functions
+    const getMoviesFunction = this.createGetMoviesFunction();
+    const postMoviesFunction = this.createPostMoviesFunction();
+
+    // API Routes
+    this.configureRoutes(api, getMoviesFunction, postMoviesFunction);
+  }
+
+  private createApi(): RestApi {
+    return new RestApi(this, "MoviesApi", {
+      restApiName: "Movies Service",
+      description: "API for movie management",
+    });
+  }
+
+  // More helper methods...
+}
+```
+
+#### Extract Complex Logic to Helper Methods
+
+```typescript
+// ❌ Bad - Everything in constructor
+constructor(scope: Construct, id: string) {
+  super(scope, id);
+
+  const lambda = new lambda.Function(this, 'Fn', {
+    runtime: lambda.Runtime.NODEJS_20_X,
+    handler: 'index.handler',
+    code: lambda.Code.fromAsset(path.join(__dirname, '../services')),
+    environment: { /* 20 env vars */ },
+    timeout: Duration.seconds(30),
+    memorySize: 512,
+    // ... 50 more lines
+  });
+}
+
+// ✅ Good - Extract to helper methods
+constructor(scope: Construct, id: string) {
+  super(scope, id);
+  const movieFunction = this.createMovieFunction();
+}
+
+private createMovieFunction(): lambda.Function {
+  return new lambda.Function(this, 'MovieFunction', {
+    ...this.getDefaultLambdaProps(),
+    environment: this.getMovieFunctionEnvironment(),
+  });
+}
+
+private getDefaultLambdaProps(): Partial<lambda.FunctionProps> {
+  return {
+    runtime: lambda.Runtime.NODEJS_20_X,
+    timeout: Duration.seconds(30),
+    memorySize: 512,
+  };
+}
+```
+
+#### Use Constants for Configuration
+
+```typescript
+// ✅ Good - Configuration at the top
+export class DataStack extends Stack {
+  private readonly TABLE_NAME = "Movies";
+  private readonly READ_CAPACITY = 5;
+  private readonly WRITE_CAPACITY = 5;
+
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+
+    const table = new dynamodb.Table(this, "MoviesTable", {
+      tableName: this.TABLE_NAME,
+      readCapacity: this.READ_CAPACITY,
+      writeCapacity: this.WRITE_CAPACITY,
+      // ...
+    });
+  }
+}
+```
+
+### Lambda Handler Simplicity
+
+#### Single Responsibility
+
+```typescript
+// ✅ Good - Each handler does one thing
+// services/movies/GetMovies.ts
+export const handler = async (event: APIGatewayProxyEvent) => {
+  const movieId = event.pathParameters?.id;
+  if (!movieId) return createErrorResponse(400, "Movie ID required");
+
+  const movie = await fetchMovieById(movieId);
+  if (!movie) return createErrorResponse(404, "Movie not found");
+
+  return createSuccessResponse(movie);
+};
+```
+
+#### Shared Utilities for Common Patterns
+
+```typescript
+// services/shared/ApiResponses.ts
+export const createSuccessResponse = (data: unknown) => ({
+  statusCode: 200,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data),
+});
+
+export const createErrorResponse = (statusCode: number, message: string) => ({
+  statusCode,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ error: message }),
+});
+```
+
+### When to Add Complexity
+
+Only increase complexity when:
+
+- **Performance is critical** and profiling proves the simple solution is insufficient
+- **Security requires it** (e.g., encryption, validation)
+- **AWS best practices demand it** (e.g., specific IAM policies)
+- **Scale necessitates it** (e.g., caching, optimization)
+
+Even then:
+
+1. Document WHY the complexity is needed
+2. Isolate complex code in well-named functions
+3. Add comments explaining the non-obvious parts
+
+### Code Review Checklist
+
+Before committing, ask:
+
+- [ ] Can a new team member understand this code?
+- [ ] Are variable and function names self-explanatory?
+- [ ] Is each function doing only one thing?
+- [ ] Can I simplify any conditional logic?
+- [ ] Have I avoided premature optimization?
+- [ ] Would I understand this code in 6 months?
+
+## AWS CDK Best Practices
+
+### Stack Organization
+
+- Keep stacks focused and single-purpose
+- Use stack dependencies explicitly with `stack.addDependency()`
+- Pass resources between stacks via constructor parameters or properties
+- Avoid circular dependencies between stacks
+
+### Resource Naming
+
+- Use consistent resource naming with the pattern: `${stackName}-${resourceType}-${purpose}`
+- Apply tags to all resources for cost tracking and organization
+- Use CDK's `Names.uniqueId()` for resources that need unique names
+
+### Infrastructure Code
+
+```typescript
+// Always specify removal policies explicitly
+const table = new dynamodb.Table(this, "MyTable", {
+  removalPolicy: RemovalPolicy.RETAIN, // or DESTROY for dev
+});
+
+// Use environment variables for Lambda configuration
+const lambda = new lambda.Function(this, "MyFunction", {
+  environment: {
+    TABLE_NAME: table.tableName,
+    REGION: Stack.of(this).region,
+  },
+});
+
+// Grant permissions explicitly
+table.grantReadWriteData(lambda);
+```
+
+### Lambda Functions
+
+- Keep handler files in `/services` organized by feature/domain
+- Export handler as named export `handler`
+- Use layers for shared dependencies
+- Set appropriate timeout and memory based on function needs
+- Use environment variables for configuration, never hardcode ARNs
+
+### Example Lambda Structure
+
+```typescript
+// services/movies/GetMovies.ts
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+
+export const handler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
+  // Implementation
+};
+```
+
+## Stack-Specific Guidelines
+
+### DataStack
+
+- Define all DynamoDB tables, S3 buckets, and data stores
+- Export table names and ARNs for use in other stacks
+- Set appropriate billing modes (PAY_PER_REQUEST vs PROVISIONED)
+- Configure backup and point-in-time recovery for production
+
+### LambdaStack
+
+- Reference DataStack for table permissions
+- Group Lambda functions by feature/service
+- Use shared layers for common dependencies
+- Configure VPC settings if needed for database access
+
+### ApiStack
+
+- Use API Gateway Rest API or HTTP API based on requirements
+- Implement proper CORS configuration
+- Add request validation where appropriate
+- Use Lambda proxy integration for flexibility
+- Configure throttling and rate limiting
+
+### AuthStack
+
+- Use Cognito User Pools for authentication
+- Configure password policies and MFA
+- Set up proper OAuth flows if needed
+- Export User Pool ID and Client ID for frontend
+
+### UiDeploymentStack
+
+- Use S3 + CloudFront for static site hosting
+- Configure proper cache behaviors
+- Add custom domain with ACM certificate
+- Implement security headers via Lambda@Edge or CloudFront Functions
+
+## Launcher.ts Guidelines
+
+```typescript
+// Use CDK App properly
+import * as cdk from "aws-cdk-lib";
+import { DataStack } from "./stacks/DataStack";
+import { LambdaStack } from "./stacks/LambdaStack";
+
+const app = new cdk.App();
+
+const env = {
+  account: process.env.CDK_DEFAULT_ACCOUNT,
+  region: process.env.CDK_DEFAULT_REGION,
+};
+
+// Create stacks in dependency order
+const dataStack = new DataStack(app, "DataStack", { env });
+const lambdaStack = new LambdaStack(app, "LambdaStack", {
+  env,
+  table: dataStack.moviesTable, // Pass resources explicitly
+});
+
+app.synth();
+```
+
+## Services Directory
+
+### Handler Pattern
+
+```typescript
+// services/movies/handler.ts - Route to specific handlers
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { handler as getMovies } from "./GetMovies";
+import { handler as postMovies } from "./PostMovies";
+import { handler as updateMovies } from "./UpdateMovies";
+import { handler as deleteMovies } from "./DeleteMovies";
+
+export const handler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
+  const { httpMethod } = event;
+
+  switch (httpMethod) {
+    case "GET":
+      return getMovies(event);
+    case "POST":
+      return postMovies(event);
+    case "PUT":
+      return updateMovies(event);
+    case "DELETE":
+      return deleteMovies(event);
+    default:
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ message: "Method not allowed" }),
+      };
+  }
+};
+```
+
+### Shared Utilities
+
+- `/services/shared/Utils.ts` - Common helper functions
+- `/services/shared/Validator.ts` - Input validation logic
+- Keep utilities pure and well-tested
+- Export individual functions, not default exports
+
+### Models
+
+- Define TypeScript interfaces for data models in `/services/models`
+- Keep models consistent with DynamoDB schema
+- Use strict typing for API requests/responses
+
+```typescript
+// services/models/Model.ts
+export interface Movie {
+  id: string;
+  title: string;
+  year: number;
+  genre: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMovieRequest {
+  title: string;
+  year: number;
+  genre: string[];
+}
+```
+
+## Error Handling
+
+### In Lambda Functions
+
+```typescript
+try {
+  // Business logic
+  return {
+    statusCode: 200,
+    body: JSON.stringify(result),
+  };
+} catch (error) {
+  console.error("Error:", error);
+  return {
+    statusCode: 500,
+    body: JSON.stringify({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    }),
+  };
+}
+```
+
+### In CDK Stacks
+
+- Validate props in constructor
+- Throw descriptive errors for misconfigurations
+- Use CDK assertions for infrastructure validation
+
+## Testing
+
+### Unit Tests
+
+- Test Lambda handlers with mocked AWS SDK clients
+- Test utility functions independently
+- Aim for >80% code coverage
+
+### Integration Tests
+
+- Use CDK assertions for infrastructure tests
+- Test stack synthesis without errors
+- Validate resource properties and relationships
+
+## Environment Management
+
+### Configuration
+
+```typescript
+// utils.ts - Environment-specific configuration
+export const getConfig = (stage: string) =>
+  ({
+    dev: {
+      tableBilling: "PAY_PER_REQUEST",
+      lambdaMemory: 256,
+      logRetention: 7,
+    },
+    prod: {
+      tableBilling: "PROVISIONED",
+      lambdaMemory: 512,
+      logRetention: 30,
+    },
+  })[stage];
+```
+
+### Environment Variables
+
+- Use `.env` files for local development (never commit)
+- Use CDK context or stack parameters for deployment config
+- Use AWS Secrets Manager or Parameter Store for sensitive values
+
+## Security Best Practices
+
+- **Never** hardcode credentials or sensitive data
+- Use IAM roles and policies with least privilege
+- Enable encryption at rest for DynamoDB and S3
+- Use HTTPS/TLS for all API endpoints
+- Implement input validation in Lambda functions
+- Enable AWS WAF for public APIs
+- Use VPC endpoints for AWS service communication when possible
+
+## Performance Optimization
+
+- Use DynamoDB single-table design where appropriate
+- Implement caching with CloudFront or ElastiCache
+- Configure Lambda reserved concurrency for critical functions
+- Use Lambda Powertools for tracing and metrics
+- Enable X-Ray tracing for debugging
+
+## Documentation
+
+- Add JSDoc comments for all exported functions and classes
+- Document stack outputs and their purposes
+- Maintain README with deployment instructions
+- Document environment variables and their defaults
+
+## Git & Version Control
+
+- Never commit `node_modules` or `cdk.out`
+- Use meaningful commit messages
+- Tag releases with semantic versioning
+- Keep `package.json` and `package-lock.json` in sync
+
+## CDK Commands Reference
+
+```bash
+# Synthesize CloudFormation template
+npm run cdk synth
+
+# Deploy all stacks
+npm run cdk deploy --all
+
+# Deploy specific stack
+npm run cdk deploy DataStack
+
+# Destroy all resources
+npm run cdk destroy --all
+
+# View differences
+npm run cdk diff
+
+# List all stacks
+npm run cdk list
+```
+
+## When Making Changes
+
+1. Update types/interfaces first
+2. Modify infrastructure code in stacks
+3. Update Lambda handlers and business logic
+4. Run `cdk synth` to validate
+5. Test locally if possible
+6. Deploy to dev environment first
+7. Validate changes before promoting to production
+
+---
+
+Follow these rules to maintain consistency, security, and best practices across the AWS CDK infrastructure project.
