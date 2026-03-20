@@ -81,10 +81,12 @@ export class UiDeploymentStack extends Stack {
       ],
     });
 
-    // Upload the static build files to the S3 bucket
+    // Upload the static build files to the S3 bucket and invalidate CloudFront cache
     new BucketDeployment(this, "Example2Deployment", {
       destinationBucket: deploymentBucket,
       sources: [Source.asset(uiDir)],
+      distribution: distribution,
+      distributionPaths: ["/*"],
     });
 
     // DNS record pointing arkun.com to the CloudFront distribution
