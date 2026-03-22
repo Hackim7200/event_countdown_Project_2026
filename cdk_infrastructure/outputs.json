@@ -1,20 +1,23 @@
 {
   "CountdownApp-DataStack": {
-    "ExportsOutputRefUserItemsTableA40148DD201ADF08": "UserItemsTable-02bffbf04063",
-    "ExportsOutputFnGetAttUserItemsTableA40148DDArnA7FA6416": "arn:aws:dynamodb:eu-west-2:759135634975:table/UserItemsTable-02bffbf04063"
+    "ExportsOutputRefUserItemsTableA40148DD201ADF08": "UserItemsTable-0af2349cba1f",
+    "ExportsOutputFnGetAttUserItemsTableA40148DDArnA7FA6416": "arn:aws:dynamodb:eu-west-2:759135634975:table/UserItemsTable-0af2349cba1f"
   },
   "CountdownApp-AuthStack": {
-    "CountdownIdentityPoolId": "eu-west-2:929320cb-7d2d-4224-be7d-b00c0bd67bce",
-    "UserPoolId": "eu-west-2_w5Od4ZXYY",
-    "ExportsOutputFnGetAttCountdownUserPoolFB40AE01ArnB155B27F": "arn:aws:cognito-idp:eu-west-2:759135634975:userpool/eu-west-2_w5Od4ZXYY",
-    "CountdownUserPoolClientId": "4soqgdm7niv8tjdasblg60k351"
+    "CountdownIdentityPoolId": "eu-west-2:eb2550ba-e98b-4bc3-8e06-404f25b58a2f",
+    "UserPoolId": "eu-west-2_Y4p14HQAy",
+    "ExportsOutputFnGetAttCountdownUserPoolFB40AE01ArnB155B27F": "arn:aws:cognito-idp:eu-west-2:759135634975:userpool/eu-west-2_Y4p14HQAy",
+    "CountdownUserPoolClientId": "50id1e2m1ajjuid2g1dtuj89ib"
   },
   "CountdownApp-LambdaStack": {
-    "ExportsOutputFnGetAttPomodorosLambda3204FBCEArnA1CF40DF": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-PomodorosLambda3204FBCE-OijY7rJxevru",
-    "ExportsOutputFnGetAttEventsLambdaE6050439Arn4DABAABB": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-EventsLambdaE6050439-rskgNX41Uv0I",
-    "ExportsOutputFnGetAttTodosLambdaD044F98AArn54AE6F97": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-TodosLambdaD044F98A-9Secinee0uQr"
+    "ExportsOutputFnGetAttPomodorosLambda3204FBCEArnA1CF40DF": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-PomodorosLambda3204FBCE-0nPVrKF7punR",
+    "ExportsOutputFnGetAttEventsLambdaE6050439Arn4DABAABB": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-EventsLambdaE6050439-6SVmuB94plzH",
+    "ExportsOutputFnGetAttTodosLambdaD044F98AArn54AE6F97": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-TodosLambdaD044F98A-kF7RRZka4fpB"
   },
   "CountdownApp-ApiStack": {
-    "CountdownApiEndpoint7FAEED7E": "https://vzf3si0iob.execute-api.eu-west-2.amazonaws.com/prod/"
+    "CountdownApiEndpoint7FAEED7E": "https://lctuoxqj29.execute-api.eu-west-2.amazonaws.com/prod/"
+  },
+  "CountdownApp-UiDeploymentStack": {
+    "SiteUrl": "https://arkun.co.uk"
   }
 }

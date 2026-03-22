@@ -1,0 +1,3 @@
+.tsa-events-canvas {
+  min-height: min(72vh, calc(100dvh - 72px));
+}
