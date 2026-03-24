@@ -1,4 +1,10 @@
-import { CfnOutput, Duration, Stack, StackProps } from "aws-cdk-lib";
+import {
+  CfnOutput,
+  Duration,
+  RemovalPolicy,
+  Stack,
+  StackProps,
+} from "aws-cdk-lib";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 import { join } from "path";
@@ -33,7 +39,8 @@ export class UiDeploymentStack extends Stack {
     // CloudFront requires ACM certificates to be in us-east-1
     super(scope, id, props);
 
-    // Look up the existing Route 53 hosted zone for arkun.com
+    // Hosted zone must already exist in Route 53; it is not created or deleted by this stack.
+    // The stack only manages the apex alias, ACM validation records, and other resources here.
     const hostedZone = HostedZone.fromLookup(this, "HostedZone", {
       domainName: DOMAIN_NAME,
     });
@@ -47,6 +54,8 @@ export class UiDeploymentStack extends Stack {
     // S3 bucket to store the static frontend files
     const deploymentBucket = new Bucket(this, "uiDeploymentBucket", {
       bucketName: `arkun-co-uk-frontend`,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
     });
 
     // Path to the Next.js static export output (`npm run build` -> `out/`)
@@ -141,7 +150,9 @@ function handler(event) {
       distributionPaths: ["/*"],
     });
 
-    // DNS record pointing arkun.com to the CloudFront distribution
+    // Apex alias to CloudFront; removed when the stack is deleted (no RETAIN like the S3 default).
+    // If deploy fails with "already exists", remove or import the conflicting record in Route 53 —
+    // CDK deprecated deleteExisting (unsafe downtime / failed-deploy rollback).
     new ARecord(this, "SiteAliasRecord", {
       zone: hostedZone,
       target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),

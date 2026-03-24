@@ -15,6 +15,7 @@ interface ApiStackProps extends StackProps {
   eventsLambdaIntegration: LambdaIntegration;
   todosLambdaIntegration: LambdaIntegration;
   pomodorosLambdaIntegration: LambdaIntegration;
+  profileLambdaIntegration: LambdaIntegration;
   userPool: IUserPool;
 }
 
@@ -119,6 +120,14 @@ export class ApiStack extends Stack {
     pomodorosResource.addMethod(
       "DELETE",
       props.pomodorosLambdaIntegration,
+      optionsWithAuth,
+    );
+
+    //////////// Profile Resource ////////////
+    const profileResource = api.root.addResource("profile", optionsWithCors);
+    profileResource.addMethod(
+      "DELETE",
+      props.profileLambdaIntegration,
       optionsWithAuth,
     );
   }

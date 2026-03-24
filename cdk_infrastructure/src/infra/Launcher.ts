@@ -38,8 +38,9 @@ const apiStack = new ApiStack(app, `${appName}-ApiStack`, {
   eventsLambdaIntegration: lambdaStack.eventsLambdaIntegration,
   todosLambdaIntegration: lambdaStack.todosLambdaIntegration,
   pomodorosLambdaIntegration: lambdaStack.pomodorosLambdaIntegration,
+  profileLambdaIntegration: lambdaStack.profileLambdaIntegration,
   userPool: authStack.userPool,
 });
 
 // UI stack goes to us-east-1 (required for CloudFront + ACM certificate)
-const uiStack = new UiDeploymentStack(app, `${appName}-UiDeploymentStack`, { env: usEastEnv });
+const uiStack = new UiDeploymentStack(app, `${appName}-UiDeploymentStack`, { env: usEastEnv }); // { env: usEastEnv } because CloudFront requires ACM certificates in us-east-1

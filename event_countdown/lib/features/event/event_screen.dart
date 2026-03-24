@@ -35,7 +35,7 @@ class _EventScreenState extends State<EventScreen> {
       length: 2,
       child: Scaffold(
         appBar: CustomAppBar(title: 'Events'),
-        drawer: const LeftDrawer(),
+        // drawer: const LeftDrawer(),
         endDrawer: const RightDrawer(),
 
         floatingActionButton: FloatingActionButton(

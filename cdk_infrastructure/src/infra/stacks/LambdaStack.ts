@@ -17,6 +17,7 @@ export class LambdaStack extends Stack {
   public readonly eventsLambdaIntegration: LambdaIntegration;
   public readonly todosLambdaIntegration: LambdaIntegration;
   public readonly pomodorosLambdaIntegration: LambdaIntegration;
+  public readonly profileLambdaIntegration: LambdaIntegration;
 
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props);
@@ -127,6 +128,43 @@ export class LambdaStack extends Stack {
     );
     this.pomodorosLambdaIntegration = new LambdaIntegration(PomodorosLambda);
 
+    // Profile Lambda
+
+    const ProfileLambda = new NodejsFunction(this, "ProfileLambda", {
+      runtime: Runtime.NODEJS_20_X,
+      handler: "handler",
+      entry: join(
+        __dirname,
+        "..",
+        "..",
+        "services",
+        "lambdas",
+        "profile",
+        "handler.ts",
+      ),
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    ProfileLambda.addToRolePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        resources: [table.tableArn],
+        actions: [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:BatchWriteItem",
+        ],
+      }),
+    );
+    this.profileLambdaIntegration = new LambdaIntegration(ProfileLambda);
+
+    
+
     //////////// Cleanup Old Todos (scheduled) ////////////
 
     const cleanupLambda = new NodejsFunction(this, "CleanupOldTodosLambda", {
@@ -163,4 +201,10 @@ export class LambdaStack extends Stack {
       targets: [new LambdaFunction(cleanupLambda)],
     });
   }
+
+
+  
 }
+
+
+

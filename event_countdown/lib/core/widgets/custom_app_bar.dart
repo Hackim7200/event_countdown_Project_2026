@@ -14,13 +14,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(title),
       centerTitle: true,
       // these open the drawers that are defined below
-      leading: Builder(
-        builder: (context) => IconButton(
-          icon: const Icon(Icons.menu_rounded),
-          tooltip: 'Menu',
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
-      ),
+      // leading: Builder(
+      //   builder: (context) => IconButton(
+      //     icon: const Icon(Icons.menu_rounded),
+      //     tooltip: 'Menu',
+      //     onPressed: () => Scaffold.of(context).openDrawer(),
+      //   ),
+      // ),
       actions: [
         Builder(
           builder: (context) => IconButton(

@@ -19,7 +19,7 @@ class _TodoScreenState extends State<TodoScreen> {
       length: 2,
       child: Scaffold(
         appBar: const CustomAppBar(title: 'Todo'),
-        drawer: const LeftDrawer(),
+        // drawer: const LeftDrawer(),
         endDrawer: const RightDrawer(),
         body: Column(
           children: [

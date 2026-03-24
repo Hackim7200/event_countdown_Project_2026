@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/app/theme.dart';
+import 'package:event_countdown/core/screens/delete_profile.dart';
 import 'package:flutter/material.dart';
 
 /// Right-side or dedicated drawer focused on the signed-in user (account + sign out).
@@ -95,16 +96,10 @@ class RightDrawer extends StatelessWidget {
 
                 ListTile(
                   leading: const Icon(Icons.manage_accounts_outlined),
-                  title: const Text('Edit profile'),
-                  subtitle: const Text('Coming soon'),
-                  onTap: () => Navigator.pop(context),
+                  title: const Text('Delete profile'),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DeleteProfile())),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.lock_outline),
-                  title: const Text('Account & security'),
-                  subtitle: const Text('Coming soon'),
-                  onTap: () => Navigator.pop(context),
-                ),
+              
                 const Spacer(),
                 const Divider(height: 1),
                 ListTile(
