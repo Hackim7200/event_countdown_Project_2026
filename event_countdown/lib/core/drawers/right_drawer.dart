@@ -3,8 +3,8 @@ import 'package:event_countdown/app/theme.dart';
 import 'package:flutter/material.dart';
 
 /// Right-side or dedicated drawer focused on the signed-in user (account + sign out).
-class ProfileAppDrawer extends StatelessWidget {
-  const ProfileAppDrawer({super.key});
+class RightDrawer extends StatelessWidget {
+  const RightDrawer({super.key});
 
   static String _attribute(
     List<AuthUserAttribute> attributes,

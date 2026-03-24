@@ -1,4 +1,3 @@
-import 'package:event_countdown/core/widgets/left_app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:event_countdown/features/event/event_screen.dart';
 import 'package:event_countdown/features/todo/todo_screen.dart';

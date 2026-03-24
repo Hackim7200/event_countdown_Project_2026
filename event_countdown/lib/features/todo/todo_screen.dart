@@ -1,5 +1,6 @@
-import 'package:event_countdown/core/widgets/left_app_drawer.dart';
-import 'package:event_countdown/core/widgets/profile_app_drawer.dart';
+import 'package:event_countdown/core/drawers/left_drawer.dart';
+import 'package:event_countdown/core/drawers/right_drawer.dart';
+import 'package:event_countdown/core/widgets/custom_app_bar.dart';
 import 'package:event_countdown/features/todo/sub_screens/today_screen.dart';
 import 'package:event_countdown/features/todo/sub_screens/tomorrow_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,29 +18,9 @@ class _TodoScreenState extends State<TodoScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Todo'),
-          centerTitle: true,
-          // these open the drawers that are defined below
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu_rounded),
-              tooltip: 'Menu',
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
-          actions: [
-            Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(Icons.account_circle_outlined),
-                tooltip: 'Profile',
-                onPressed: () => Scaffold.of(context).openEndDrawer(),
-              ),
-            ),
-          ],
-        ),
-        drawer: const LeftAppDrawer(),
-        endDrawer: const ProfileAppDrawer(),
+        appBar: const CustomAppBar(title: 'Todo'),
+        drawer: const LeftDrawer(),
+        endDrawer: const RightDrawer(),
         body: Column(
           children: [
             const TabBar(

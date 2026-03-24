@@ -31,4 +31,5 @@ Future<void> _configureAmplify() async {
     safePrint('Error configuring Amplify: $e');
   }
 }
+
 // Amplify 

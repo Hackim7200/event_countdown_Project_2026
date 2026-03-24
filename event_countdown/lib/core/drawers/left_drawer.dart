@@ -2,8 +2,8 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/app/theme.dart';
 import 'package:flutter/material.dart';
 
-class LeftAppDrawer extends StatelessWidget {
-  const LeftAppDrawer({super.key});
+class LeftDrawer extends StatelessWidget {
+  const LeftDrawer({super.key});
 
   Future<String> _getUserEmail() async {
     try {
