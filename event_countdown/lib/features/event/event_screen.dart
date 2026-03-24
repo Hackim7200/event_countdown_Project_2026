@@ -1,3 +1,4 @@
+import 'package:event_countdown/core/widgets/left_app_drawer.dart';
 import 'package:event_countdown/features/event/forms/add_event_bottom_sheet.dart';
 import 'package:event_countdown/features/event/sub_screens/future_section.dart';
 import 'package:event_countdown/features/event/sub_screens/past_section.dart';
@@ -32,6 +33,7 @@ class _EventScreenState extends State<EventScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(title: const Text("Events"), centerTitle: true),
+        drawer: const LeftAppDrawer(),
 
         floatingActionButton: FloatingActionButton(
           onPressed: _openAddEventSheet,
