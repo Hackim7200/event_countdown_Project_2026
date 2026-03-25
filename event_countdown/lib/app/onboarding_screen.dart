@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 
 /// Shown before the Amplify sign-in UI until the user taps through.
 class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({super.key, required this.onContinue});
+  const OnboardingScreen({
+    super.key,
+    required this.onContinue,
+    required this.onContinueAsGuest,
+  });
 
   final VoidCallback onContinue;
+  final VoidCallback onContinueAsGuest;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurface.withValues(alpha: 0.75);
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -31,9 +37,7 @@ class OnboardingScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 'Sign in to sync your countdowns and tasks across devices.',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
-                ),
+                style: theme.textTheme.bodyMedium?.copyWith(color: muted),
                 textAlign: TextAlign.center,
               ),
               const Spacer(flex: 3),
@@ -42,6 +46,10 @@ class OnboardingScreen extends StatelessWidget {
                 child: const Text('Get started'),
               ),
               const SizedBox(height: 12),
+              TextButton(
+                onPressed: onContinueAsGuest,
+                child: const Text('Continue as guest'),
+              ),
             ],
           ),
         ),

@@ -12,6 +12,11 @@ Generate code, corrections, and refactorings that comply with the basic principl
   - Create necessary types.
 - Don't leave blank lines within a function.
 - One export per file.
+- Prefer simple code and easy to understand code over complex code
+- follow the upto date documentation
+- follow commonly used coding standard
+- write human readable code and comments
+- check upto date documentation and best practices practices when coding new functionality
 
 ### Nomenclature
 
