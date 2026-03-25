@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:event_countdown/features/models/pomdoro_model.dart';
+import 'package:event_countdown/features/pomdoro/services/pomodoro_repository.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -17,12 +18,16 @@ class PomodoroTile extends StatefulWidget {
     super.key,
     required this.pomodoro,
     required this.todoId,
+    this.repository,
     this.onCompleted,
     this.onDeleted,
   });
 
   final Pomodoro pomodoro;
   final String todoId;
+
+  /// When null, uses [PomodoroService] (signed-in API).
+  final PomodoroRepository? repository;
 
   /// Called after the pomodoro is marked completed in the backend.
   final VoidCallback? onCompleted;
@@ -35,9 +40,11 @@ class PomodoroTile extends StatefulWidget {
 }
 
 class _PomodoroTileState extends State<PomodoroTile> {
-  final _service = PomodoroService();
-
   late Pomodoro _pomodoro;
+//when in guest mode, use GuestLocalFocusStore but when signed in, use PomodoroService
+
+  PomodoroRepository get _repository =>
+      widget.repository ?? PomodoroService();
   Timer? _ticker;
   Duration _remaining = Duration.zero;
   bool _isStarting = false;
@@ -54,7 +61,8 @@ class _PomodoroTileState extends State<PomodoroTile> {
   @override
   void didUpdateWidget(covariant PomodoroTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.pomodoro.id != widget.pomodoro.id ||
+    if (oldWidget.repository != widget.repository ||
+        oldWidget.pomodoro.id != widget.pomodoro.id ||
         oldWidget.pomodoro.startedAt != widget.pomodoro.startedAt ||
         oldWidget.pomodoro.status != widget.pomodoro.status) {
       _pomodoro = widget.pomodoro;
@@ -103,7 +111,7 @@ class _PomodoroTileState extends State<PomodoroTile> {
 
   Future<void> _handleStart() async {
     setState(() => _isStarting = true);
-    final startedAt = await _service.startPomodoro(
+    final startedAt = await _repository.startPomodoro(
       pomodoroId: _pomodoro.id,
       todoId: widget.todoId,
     );
@@ -130,7 +138,7 @@ class _PomodoroTileState extends State<PomodoroTile> {
 
   Future<void> _handlePause() async {
     setState(() => _isPausing = true);
-    final newElapsed = await _service.pausePomodoro(
+    final newElapsed = await _repository.pausePomodoro(
       pomodoroId: _pomodoro.id,
       todoId: widget.todoId,
     );
@@ -163,7 +171,7 @@ class _PomodoroTileState extends State<PomodoroTile> {
 
   Future<void> _handleReset() async {
     setState(() => _isResetting = true);
-    final success = await _service.resetPomodoro(
+    final success = await _repository.resetPomodoro(
       pomodoroId: _pomodoro.id,
       todoId: widget.todoId,
     );
@@ -195,7 +203,7 @@ class _PomodoroTileState extends State<PomodoroTile> {
   }
 
   Future<void> _markCompleted() async {
-    final success = await _service.completePomodoro(
+    final success = await _repository.completePomodoro(
       pomodoroId: _pomodoro.id,
       todoId: widget.todoId,
     );

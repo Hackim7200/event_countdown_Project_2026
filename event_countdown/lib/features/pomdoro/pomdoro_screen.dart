@@ -1,21 +1,32 @@
 import 'package:event_countdown/features/pomdoro/forms/pomodoro_form.dart';
+import 'package:event_countdown/features/pomdoro/services/pomodoro_repository.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
 import 'package:event_countdown/features/pomdoro/widget/pomodoro_tile.dart';
 import 'package:event_countdown/features/models/pomdoro_model.dart';
 import 'package:flutter/material.dart';
 
 class PomodoroScreen extends StatefulWidget {
-  const PomodoroScreen({super.key, required this.todoId, this.title});
+  const PomodoroScreen({
+    super.key,
+    required this.todoId,
+    this.title,
+    this.repository,
+  });
 
   final String? todoId;
   final String? title;
+
+  /// When null, uses [PomodoroService] (cloud).
+  final PomodoroRepository? repository;
 
   @override
   State<PomodoroScreen> createState() => _PomodoroScreenState();
 }
 
 class _PomodoroScreenState extends State<PomodoroScreen> {
-  final _pomodoroService = PomodoroService();
+  PomodoroRepository get _repository =>
+      widget.repository ?? PomodoroService();
+
   List<Pomodoro> _pomodoros = [];
   bool _isLoading = true;
   String? _error;
@@ -42,7 +53,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
     });
 
     try {
-      final list = await _pomodoroService.getPomodoros(todoId);
+      final list = await _repository.getPomodoros(todoId);
       if (mounted) {
         setState(() {
           _pomodoros = list;
@@ -74,8 +85,11 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) =>
-          AddPomodoroBottomSheet(todoId: todoId, title: widget.title ?? 'Task'),
+      builder: (context) => AddPomodoroBottomSheet(
+        todoId: todoId,
+        title: widget.title ?? 'Task',
+        repository: widget.repository,
+      ),
     );
     if (!mounted) return;
     if (result != null) {
@@ -160,13 +174,14 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
             key: ValueKey(pomodoro.id),
             pomodoro: pomodoro,
             todoId: widget.todoId!,
+            repository: widget.repository,
             onCompleted: _loadPomodoros, // reloads list
             onDeleted: () async {
               final messenger = ScaffoldMessenger.of(context);
               final removed = _pomodoros[index];
               setState(() => _pomodoros.removeAt(index));
 
-              final success = await _pomodoroService.deletePomodoro(
+              final success = await _repository.deletePomodoro(
                 pomodoroId: pomodoro.id,
                 todoId: widget.todoId!,
               );

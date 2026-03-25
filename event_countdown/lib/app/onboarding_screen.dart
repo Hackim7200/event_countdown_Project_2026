@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 /// Shown before the Amplify sign-in UI until the user taps through.
@@ -36,16 +37,21 @@ class OnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Sign in to sync your countdowns and tasks across devices.',
+                'Use the focus timer without an account. Sign in only if you want '
+                'todos and events synced across devices.',
                 style: theme.textTheme.bodyMedium?.copyWith(color: muted),
                 textAlign: TextAlign.center,
               ),
               const Spacer(flex: 3),
-              FilledButton(
-                onPressed: onContinue,
-                child: const Text('Get started'),
-              ),
+
+              // Guideline 5.1.1(v): non–account-based features (timer) must not
+              // require registration — this path collects no personal data.
               const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: onContinue,
+                child: const Text('Sign in to sync'),
+              ),
+              const SizedBox(height: 8),
               TextButton(
                 onPressed: onContinueAsGuest,
                 child: const Text('Continue as guest'),

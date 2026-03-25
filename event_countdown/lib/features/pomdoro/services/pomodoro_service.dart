@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/core/service/auth_service.dart';
 import 'package:event_countdown/features/models/pomdoro_model.dart';
+import 'package:event_countdown/features/pomdoro/services/pomodoro_repository.dart';
 
 /// Service class for handling all Pomodoro-related API operations.
 /// Backend uses a single-table design; all requests require the current user's id (Cognito sub).
-class PomodoroService {
+class PomodoroService implements PomodoroRepository {
   static const String _apiName = 'CountdownApi';
   static const String _pomodorosEndpoint = '/pomodoros';
 
@@ -14,6 +15,7 @@ class PomodoroService {
 
   /// Fetches all pomodoro sessions for a todo.
   /// Returns empty list on auth/API errors.
+  @override
   Future<List<Pomodoro>> getPomodoros(String todoId) async {
     try {
       final token = await authService.getIdToken();
@@ -54,6 +56,7 @@ class PomodoroService {
   /// Adds a new pomodoro session for a todo.
   /// Returns the new pomodoro id if successful, null otherwise.
   /// Backend expects [userId], [todoId], [title], [timerDurationInMinutes].
+  @override
   Future<String?> addPomodoro({
     required String todoId,
     required String title,
@@ -103,6 +106,7 @@ class PomodoroService {
 
   /// Starts the timer for a pomodoro by saving a startedAt timestamp in the DB.
   /// Returns the server-assigned [startedAt] DateTime on success.
+  @override
   Future<DateTime?> startPomodoro({
     required String pomodoroId,
     required String todoId,
@@ -141,6 +145,7 @@ class PomodoroService {
 
   /// Pauses a running pomodoro. The server accumulates elapsed time and clears
   /// startedAt. Returns the new total [elapsedSeconds], or null on failure.
+  @override
   Future<int?> pausePomodoro({
     required String pomodoroId,
     required String todoId,
@@ -176,6 +181,7 @@ class PomodoroService {
 
   /// Resets a pomodoro back to its initial state: clears startedAt,
   /// sets elapsedSeconds to 0, and sets status to "stopped".
+  @override
   Future<bool> resetPomodoro({
     required String pomodoroId,
     required String todoId,
@@ -208,6 +214,7 @@ class PomodoroService {
 
   /// Deletes a pomodoro session.
   /// Returns true if successful, false otherwise.
+  @override
   Future<bool> deletePomodoro({
     required String pomodoroId,
     required String todoId,
@@ -245,6 +252,7 @@ class PomodoroService {
   }
 
   /// Marks a pomodoro as completed in the DB.
+  @override
   Future<bool> completePomodoro({
     required String pomodoroId,
     required String todoId,

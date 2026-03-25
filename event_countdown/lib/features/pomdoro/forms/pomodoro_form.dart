@@ -1,4 +1,5 @@
 import 'package:event_countdown/features/models/pomdoro_model.dart';
+import 'package:event_countdown/features/pomdoro/services/pomodoro_repository.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
 import 'package:flutter/material.dart';
 
@@ -11,10 +12,14 @@ class AddPomodoroBottomSheet extends StatefulWidget {
     super.key,
     required this.todoId,
     required this.title,
+    this.repository,
   });
 
   final String todoId;
   final String title;
+
+  /// When null, uses [PomodoroService].
+  final PomodoroRepository? repository;
 
   @override
   State<AddPomodoroBottomSheet> createState() => _AddPomodoroBottomSheetState();
@@ -47,7 +52,8 @@ class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
     setState(() => _isLoading = true);
 
     try {
-      final newId = await PomodoroService().addPomodoro(
+      final repo = widget.repository ?? PomodoroService();
+      final newId = await repo.addPomodoro(
         todoId: widget.todoId,
         title: title,
         timerDurationInMinutes: _durationMinutes,
@@ -70,7 +76,7 @@ class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Failed to start session. Check sign-in and try again.',
+              'Failed to create session. Try again.',
             ),
             backgroundColor: Colors.red,
           ),
