@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:event_countdown/app/app.dart';
 import 'amplifyconfiguration.dart';
 
-
 Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
@@ -33,4 +32,4 @@ Future<void> _configureAmplify() async {
   }
 }
 
-// Amplify 
+// Amplify
