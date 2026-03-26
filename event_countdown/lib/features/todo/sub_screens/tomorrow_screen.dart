@@ -383,6 +383,7 @@ class _TomorrowSectionState extends State<TomorrowSection> {
                 pomodoroCount: todo.pomodoros,
                 onDelete: () async {
                   final messenger = ScaffoldMessenger.of(context);
+                  final colorScheme = Theme.of(context).colorScheme;
                   final success = await _todoService.deleteTodo(
                     id: todo.id,
                     rawDate: todo.rawDate,
@@ -391,14 +392,13 @@ class _TomorrowSectionState extends State<TomorrowSection> {
                   if (success) {
                     await _loadTodos();
                   } else {
-                    final s = Theme.of(context).colorScheme;
                     messenger.showSnackBar(
                       SnackBar(
                         content: Text(
                           'Failed to delete todo. Try again.',
-                          style: TextStyle(color: s.onError),
+                          style: TextStyle(color: colorScheme.onError),
                         ),
-                        backgroundColor: s.error,
+                        backgroundColor: colorScheme.error,
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
