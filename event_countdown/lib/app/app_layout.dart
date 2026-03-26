@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:event_countdown/features/event/event_screen.dart';
 import 'package:event_countdown/features/todo/todo_screen.dart';
 
-class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+class AppLayout extends StatefulWidget {
+  const AppLayout({super.key});
 
   @override
-  State<AppShell> createState() => _AppShellState();
+  State<AppLayout> createState() => _AppLayoutState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppLayoutState extends State<AppLayout> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [TodoScreen(), EventScreen()];

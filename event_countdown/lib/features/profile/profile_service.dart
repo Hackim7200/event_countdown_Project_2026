@@ -1,5 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:event_countdown/core/service/auth_service.dart';
+import 'package:event_countdown/features/auth/service/auth_service.dart';
 
 /// Deletes all app data for the current user via REST (DynamoDB), then the client
 /// should call [Amplify.Auth.deleteUser] to remove the Cognito account.

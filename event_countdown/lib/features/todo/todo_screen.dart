@@ -1,6 +1,6 @@
 import 'package:event_countdown/core/drawers/left_drawer.dart';
 import 'package:event_countdown/core/drawers/right_drawer.dart';
-import 'package:event_countdown/core/widgets/custom_app_bar.dart';
+import 'package:event_countdown/features/guest/widgets/guest_app_bar.dart';
 import 'package:event_countdown/features/todo/sub_screens/today_screen.dart';
 import 'package:event_countdown/features/todo/sub_screens/tomorrow_screen.dart';
 import 'package:flutter/material.dart';

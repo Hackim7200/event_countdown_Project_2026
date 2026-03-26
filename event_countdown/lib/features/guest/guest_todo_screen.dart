@@ -1,6 +1,6 @@
-import 'package:event_countdown/core/service/prayer_times_service.dart';
-import 'package:event_countdown/core/widgets/custom_app_bar.dart';
+import 'package:event_countdown/features/todo/services/prayer_times_service.dart';
 import 'package:event_countdown/features/guest/services/guest_local_focus_store.dart';
+import 'package:event_countdown/features/guest/widgets/guest_app_bar.dart';
 import 'package:event_countdown/features/models/todo_model.dart';
 import 'package:event_countdown/features/pomdoro/pomdoro_screen.dart';
 import 'package:event_countdown/features/todo/widgets/period_countdown_text.dart';
@@ -11,18 +11,17 @@ import 'package:flutter/material.dart';
 ///
 /// Layout mirrors [TodaySection] (todo list + time-period header styling) while
 /// data stays on-device via [GuestLocalFocusStore].
-class GuestHomeScreen extends StatefulWidget {
-  const GuestHomeScreen({super.key, required this.onSignIn});
+class GuestTodoScreen extends StatefulWidget {
+  const GuestTodoScreen({super.key, required this.onSignIn});
 
   /// Called when the user chooses to open the Amplify Authenticator sign-in flow.
   final VoidCallback onSignIn;
 
   @override
-  State<GuestHomeScreen> createState() => _GuestHomeScreenState();
+  State<GuestTodoScreen> createState() => _GuestTodoScreenState();
 }
 
-class _GuestHomeScreenState extends State<GuestHomeScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class _GuestTodoScreenState extends State<GuestTodoScreen> {
   final _prayerTimesService = PrayerTimesService();
 
   GuestLocalFocusStore? _store;
@@ -275,10 +274,7 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                 children: [
                   const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Failed to load',
-                    style: TextStyle(fontSize: 18),
-                  ),
+                  const Text('Failed to load', style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: _loadData,
@@ -350,12 +346,7 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
     final muted = theme.colorScheme.onSurface.withValues(alpha: 0.7);
 
     return Scaffold(
-      key: _scaffoldKey,
-      appBar: CustomAppBar(
-        title: 'Todo',
-        drawerScaffoldKey: _scaffoldKey,
-      ),
-      endDrawer: _GuestSignInDrawer(onSignIn: widget.onSignIn),
+      appBar: CustomAppBar(title: 'Todo', onAccountTap: widget.onSignIn),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddTodoDialog,
         child: const Icon(Icons.add),
@@ -366,49 +357,12 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: Text(
-              'Saved on this device only. Sign in from the menu for cloud sync.',
+              'Saved on this device only. Tap the profile icon to sign in for cloud sync.',
               style: theme.textTheme.bodySmall?.copyWith(color: muted),
             ),
           ),
           Expanded(child: _buildBody()),
         ],
-      ),
-    );
-  }
-}
-
-class _GuestSignInDrawer extends StatelessWidget {
-  const _GuestSignInDrawer({required this.onSignIn});
-
-  final VoidCallback onSignIn;
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(),
-              child: Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  'Account',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.cloud_sync_outlined),
-              title: const Text('Sign in for cloud sync'),
-              onTap: () {
-                Navigator.of(context).pop();
-                onSignIn();
-              },
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -461,10 +415,7 @@ class _NewGuestTodoDialogState extends State<_NewGuestTodoDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
-        FilledButton(
-          onPressed: _submit,
-          child: const Text('Add'),
-        ),
+        FilledButton(onPressed: _submit, child: const Text('Add')),
       ],
     );
   }

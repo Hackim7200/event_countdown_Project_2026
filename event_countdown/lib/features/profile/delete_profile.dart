@@ -1,6 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/app/theme.dart';
-import 'package:event_countdown/core/service/profile_service.dart';
+import 'package:event_countdown/features/profile/profile_service.dart';
 import 'package:flutter/material.dart';
 
 /// Explains account deletion: removes app data via API, then [Amplify.Auth.deleteUser].

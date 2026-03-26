@@ -1,6 +1,6 @@
 import 'package:event_countdown/core/drawers/left_drawer.dart';
 import 'package:event_countdown/core/drawers/right_drawer.dart';
-import 'package:event_countdown/core/widgets/custom_app_bar.dart';
+import 'package:event_countdown/features/guest/widgets/guest_app_bar.dart';
 import 'package:event_countdown/features/event/forms/add_event_bottom_sheet.dart';
 import 'package:event_countdown/features/event/sub_screens/future_section.dart';
 import 'package:event_countdown/features/event/sub_screens/past_section.dart';

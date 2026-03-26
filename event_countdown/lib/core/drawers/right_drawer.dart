@@ -1,6 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/app/theme.dart';
-import 'package:event_countdown/core/screens/delete_profile.dart';
+import 'package:event_countdown/features/profile/delete_profile.dart';
 import 'package:flutter/material.dart';
 
 /// Right-side or dedicated drawer focused on the signed-in user (account + sign out).

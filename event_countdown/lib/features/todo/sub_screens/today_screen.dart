@@ -1,4 +1,4 @@
-import 'package:event_countdown/core/service/prayer_times_service.dart';
+import 'package:event_countdown/features/todo/services/prayer_times_service.dart';
 import 'package:event_countdown/features/todo/sort_todos.dart';
 import 'package:event_countdown/features/models/todo_model.dart';
 import 'package:event_countdown/features/pomdoro/pomdoro_screen.dart';

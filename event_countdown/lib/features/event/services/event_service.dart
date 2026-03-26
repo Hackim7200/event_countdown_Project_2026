@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:event_countdown/core/service/auth_service.dart';
+import 'package:event_countdown/features/auth/service/auth_service.dart';
 import 'package:event_countdown/features/models/event_model.dart';
 
 /// Service class for handling all Event-related API operations.

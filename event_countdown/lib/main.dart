@@ -4,6 +4,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:event_countdown/app/app.dart';
+import 'package:event_countdown/app/auth_route_notifier.dart';
 import 'amplifyconfiguration.dart';
 
 Future<void> main() async {
@@ -14,7 +15,9 @@ Future<void> main() async {
       DeviceOrientation.portraitDown,
     ]);
     await _configureAmplify();
-    runApp(const App());
+    final authNotifier = AuthRouteNotifier();
+    runApp(App(authNotifier: authNotifier));
+    await authNotifier.refresh();
   } on AmplifyException catch (e) {
     runApp(Text("Error configuring Amplify: ${e.message}"));
   }
