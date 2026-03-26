@@ -73,10 +73,15 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
   Future<void> _openAddPomodoroSheet() async {
     final todoId = widget.todoId ?? '';
     if (todoId.isEmpty) {
+      final s = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No task selected. Open Pomodoro from a task.'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: Text(
+            'No task selected. Open Pomodoro from a task.',
+            style: TextStyle(color: s.onError),
+          ),
+          backgroundColor: s.error,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -105,11 +110,15 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
         onPressed: _openAddPomodoroSheet,
         child: const Icon(Icons.add),
       ),
-      body: _buildBody(),
+      body: _buildBody(context),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -119,12 +128,16 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.info_outline, size: 64, color: Colors.grey),
+            Icon(
+              Icons.info_outline,
+              size: 64,
+              color: scheme.onSurfaceVariant,
+            ),
             const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18),
+              style: textTheme.titleMedium?.copyWith(fontSize: 18),
             ),
             const SizedBox(height: 16),
             if (!_error!.contains('No task'))
@@ -141,19 +154,28 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
       return RefreshIndicator(
         onRefresh: _loadPomodoros,
         child: ListView(
-          children: const [
-            SizedBox(height: 100),
+          children: [
+            const SizedBox(height: 100),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.timer_outlined, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('No pomodoros yet', style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 8),
+                  Icon(
+                    Icons.timer_outlined,
+                    size: 64,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No pomodoros yet',
+                    style: textTheme.titleMedium?.copyWith(fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     'Tap + to add one',
-                    style: TextStyle(color: Colors.grey),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -178,6 +200,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
             onCompleted: _loadPomodoros, // reloads list
             onDeleted: () async {
               final messenger = ScaffoldMessenger.of(context);
+              final snackScheme = Theme.of(context).colorScheme;
               final removed = _pomodoros[index];
               setState(() => _pomodoros.removeAt(index));
 
@@ -189,7 +212,14 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
               if (!success && mounted) {
                 setState(() => _pomodoros.insert(index, removed));
                 messenger.showSnackBar(
-                  const SnackBar(content: Text('Failed to delete pomodoro')),
+                  SnackBar(
+                    content: Text(
+                      'Failed to delete pomodoro',
+                      style: TextStyle(color: snackScheme.onError),
+                    ),
+                    backgroundColor: snackScheme.error,
+                    behavior: SnackBarBehavior.floating,
+                  ),
                 );
               }
             },

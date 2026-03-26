@@ -12,6 +12,8 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Slidable(
@@ -22,8 +24,8 @@ class EventCard extends StatelessWidget {
             if (onDelete != null)
               SlidableAction(
                 onPressed: (_) => onDelete!(),
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                backgroundColor: scheme.error,
+                foregroundColor: scheme.onError,
                 icon: Icons.delete,
                 label: 'Delete',
                 borderRadius: const BorderRadius.only(
@@ -41,12 +43,15 @@ class EventCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: scheme.surface,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: scheme.outline.withValues(alpha: 0.22),
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
+                  color: scheme.shadow.withValues(alpha: 0.07),
+                  blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -57,14 +62,12 @@ class EventCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.1),
+                    color: scheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     AppIcons.all[event.icon],
-                    color: Theme.of(context).colorScheme.primary,
+                    color: scheme.primary,
                     size: 24,
                   ),
                 ),
@@ -75,10 +78,10 @@ class EventCard extends StatelessWidget {
                     children: [
                       Text(
                         event.title,
-                        style: const TextStyle(
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: scheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -86,7 +89,7 @@ class EventCard extends StatelessWidget {
                         _getTimeDifferenceText(),
                         style: TextStyle(
                           fontSize: 14,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: scheme.primary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

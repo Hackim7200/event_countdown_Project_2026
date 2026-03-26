@@ -1,5 +1,4 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:event_countdown/app/theme.dart';
 import 'package:event_countdown/features/profile/profile_service.dart';
 import 'package:flutter/material.dart';
 
@@ -119,7 +118,7 @@ class _DeleteProfileState extends State<DeleteProfile> {
                 'You will lose access to your events, todos, and profile. '
                 'This action is permanent.',
                 style: textTheme.bodyMedium?.copyWith(
-                  color: AppColors.primaryText.withValues(alpha: 0.75),
+                  color: scheme.onSurfaceVariant,
                   height: 1.45,
                 ),
                 textAlign: TextAlign.center,
@@ -217,17 +216,19 @@ class _ConsequenceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final scheme = theme.colorScheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 22, color: AppColors.primary.withValues(alpha: 0.85)),
+        Icon(icon, size: 22, color: scheme.primary),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             text,
             style: textTheme.bodyMedium?.copyWith(
-              color: AppColors.primaryText.withValues(alpha: 0.85),
+              color: scheme.onSurface,
               height: 1.4,
             ),
           ),

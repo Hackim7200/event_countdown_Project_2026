@@ -67,7 +67,7 @@ class EventView extends StatelessWidget {
               Text(
                 daysRemaining == 1 ? 'day remaining' : 'days remaining',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
 
@@ -114,12 +114,13 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurfaceVariant;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
-          Icon(icon, size: 22, color: Colors.grey),
+          Icon(icon, size: 22, color: muted),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +128,7 @@ class _InfoRow extends StatelessWidget {
               Text(
                 label,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey,
+                  color: muted,
                   fontSize: 13,
                 ),
               ),

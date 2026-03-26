@@ -1,5 +1,4 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:event_countdown/app/theme.dart';
 import 'package:event_countdown/features/profile/delete_profile.dart';
 import 'package:flutter/material.dart';
 
@@ -42,7 +41,9 @@ class RightDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final scheme = theme.colorScheme;
 
     return Drawer(
       child: SafeArea(
@@ -58,25 +59,25 @@ class RightDrawer extends StatelessWidget {
               children: [
                 DrawerHeader(
                   margin: EdgeInsets.zero,
-                  decoration: const BoxDecoration(color: AppColors.primary),
+                  decoration: BoxDecoration(color: scheme.primary),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 36,
-                        backgroundColor: Colors.white24,
+                        backgroundColor: scheme.onPrimary.withValues(alpha: 0.2),
                         child: Icon(
                           Icons.person,
                           size: 36,
-                          color: Colors.white,
+                          color: scheme.onPrimary,
                         ),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         info.email,
                         style: textTheme.titleSmall?.copyWith(
-                          color: Colors.white,
+                          color: scheme.onPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -89,7 +90,7 @@ class RightDrawer extends StatelessWidget {
                   child: Text(
                     'Profile',
                     style: textTheme.titleSmall?.copyWith(
-                      color: AppColors.primaryText.withValues(alpha: 0.6),
+                      color: scheme.onSurfaceVariant,
                     ),
                   ),
                 ),

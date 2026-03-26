@@ -21,6 +21,7 @@ class TodoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -32,8 +33,8 @@ class TodoCard extends StatelessWidget {
             if (onDelete != null)
               SlidableAction(
                 onPressed: (_) => onDelete!(),
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                backgroundColor: scheme.error,
+                foregroundColor: scheme.onError,
                 icon: Icons.delete,
                 label: 'Delete',
                 borderRadius: BorderRadius.only(
@@ -48,12 +49,13 @@ class TodoCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
+              color: scheme.surface,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: scheme.outline.withValues(alpha: 0.22)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
+                  color: scheme.shadow.withValues(alpha: 0.07),
+                  blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -66,12 +68,12 @@ class TodoCard extends StatelessWidget {
                     children: [
                       Text(
                         todo.title,
-                        style: TextStyle(
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: todo.isCompleted
-                              ? Colors.grey
-                              : Colors.black87,
+                              ? scheme.onSurfaceVariant
+                              : scheme.onSurface,
                           decoration: todo.isCompleted
                               ? TextDecoration.lineThrough
                               : null,

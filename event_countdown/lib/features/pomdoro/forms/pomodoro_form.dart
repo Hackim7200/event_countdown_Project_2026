@@ -40,10 +40,15 @@ class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
   Future<void> _addPomodoro() async {
     final title = _taskNameController.text.trim();
     if (title.isEmpty) {
+      final s = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a task name'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: Text(
+            'Please enter a task name',
+            style: TextStyle(color: s.onError),
+          ),
+          backgroundColor: s.error,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -73,21 +78,29 @@ class _AddPomodoroBottomSheetState extends State<AddPomodoroBottomSheet> {
         );
         Navigator.of(context).pop(session);
       } else {
+        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
               'Failed to create session. Try again.',
+              style: TextStyle(color: s.onError),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: s.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
+        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to start session: ${e.toString()}'),
-            backgroundColor: Theme.of(context).colorScheme.error,
+            content: Text(
+              'Failed to start session: ${e.toString()}',
+              style: TextStyle(color: s.onError),
+            ),
+            backgroundColor: s.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }

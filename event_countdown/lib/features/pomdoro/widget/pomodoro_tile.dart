@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:event_countdown/app/theme.dart';
+
 import 'package:event_countdown/features/models/pomdoro_model.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_repository.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
@@ -41,10 +43,9 @@ class PomodoroTile extends StatefulWidget {
 
 class _PomodoroTileState extends State<PomodoroTile> {
   late Pomodoro _pomodoro;
-//when in guest mode, use GuestLocalFocusStore but when signed in, use PomodoroService
+  //when in guest mode, use GuestLocalFocusStore but when signed in, use PomodoroService
 
-  PomodoroRepository get _repository =>
-      widget.repository ?? PomodoroService();
+  PomodoroRepository get _repository => widget.repository ?? PomodoroService();
   Timer? _ticker;
   Duration _remaining = Duration.zero;
   bool _isStarting = false;
@@ -126,10 +127,15 @@ class _PomodoroTileState extends State<PomodoroTile> {
     } else {
       setState(() => _isStarting = false);
       if (mounted) {
+        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to start timer. Try again.'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: Text(
+              'Failed to start timer. Try again.',
+              style: TextStyle(color: s.onError),
+            ),
+            backgroundColor: s.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -159,10 +165,15 @@ class _PomodoroTileState extends State<PomodoroTile> {
     } else {
       setState(() => _isPausing = false);
       if (mounted) {
+        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to pause timer. Try again.'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: Text(
+              'Failed to pause timer. Try again.',
+              style: TextStyle(color: s.onError),
+            ),
+            backgroundColor: s.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -192,10 +203,15 @@ class _PomodoroTileState extends State<PomodoroTile> {
     } else {
       setState(() => _isResetting = false);
       if (mounted) {
+        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to reset timer. Try again.'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: Text(
+              'Failed to reset timer. Try again.',
+              style: TextStyle(color: s.onError),
+            ),
+            backgroundColor: s.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -220,20 +236,23 @@ class _PomodoroTileState extends State<PomodoroTile> {
   Future<void> _confirmDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Pomodoro'),
-        content: const Text('Are you sure you want to delete this session?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      builder: (dialogContext) {
+        final s = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          title: const Text('Delete Pomodoro'),
+          content: const Text('Are you sure you want to delete this session?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text('Delete', style: TextStyle(color: s.error)),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed == true) {
       widget.onDeleted?.call();
@@ -311,6 +330,8 @@ class _PomodoroTileState extends State<PomodoroTile> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final sem = theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
     final isRunning = _pomodoro.isRunning;
     final isStopped = _pomodoro.isStopped;
     final isCompleted = _pomodoro.isCompleted;
@@ -320,16 +341,16 @@ class _PomodoroTileState extends State<PomodoroTile> {
     final Color iconColor;
     if (isCompleted) {
       icon = Icons.check_circle;
-      iconColor = Colors.green;
+      iconColor = sem.pomodoroComplete;
     } else if (isRunning) {
       icon = Icons.timer;
-      iconColor = theme.colorScheme.primary;
+      iconColor = scheme.primary;
     } else if (isStopped && _pomodoro.elapsedSeconds > 0) {
       icon = Icons.pause_circle;
-      iconColor = Colors.orange;
+      iconColor = sem.pomodoroReset;
     } else {
       icon = Icons.circle_outlined;
-      iconColor = const Color.fromARGB(255, 249, 130, 130);
+      iconColor = sem.pomodoroIdle;
     }
 
     final String subtitle;
@@ -351,24 +372,24 @@ class _PomodoroTileState extends State<PomodoroTile> {
           if (!isCompleted)
             SlidableAction(
               onPressed: (_) => _handleReset(),
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.white,
+              backgroundColor: sem.pomodoroReset,
+              foregroundColor: sem.onPomodoroAccent,
               icon: Icons.restart_alt,
               // label: 'Reset',
             ),
           if (!isCompleted)
             SlidableAction(
               onPressed: (_) => _markCompleted(),
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
+              backgroundColor: sem.pomodoroComplete,
+              foregroundColor: sem.onPomodoroAccent,
               icon: Icons.check,
               // label: 'Complete',
             ),
           if (widget.onDeleted != null)
             SlidableAction(
               onPressed: (_) => _confirmDelete(),
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
               icon: Icons.delete,
               // label: 'Delete',
             ),

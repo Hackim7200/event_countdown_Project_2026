@@ -1,4 +1,3 @@
-import 'package:event_countdown/core/drawers/left_drawer.dart';
 import 'package:event_countdown/core/drawers/right_drawer.dart';
 import 'package:event_countdown/features/guest/widgets/guest_app_bar.dart';
 import 'package:event_countdown/features/todo/sub_screens/today_screen.dart';
@@ -19,7 +18,6 @@ class _TodoScreenState extends State<TodoScreen> {
       length: 2,
       child: Scaffold(
         appBar: const CustomAppBar(title: 'Todo'),
-        // drawer: const LeftDrawer(),
         endDrawer: const RightDrawer(),
         body: Column(
           children: [

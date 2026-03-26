@@ -157,6 +157,9 @@ class _TomorrowSectionState extends State<TomorrowSection> {
   }
 
   Widget _buildBody() {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -171,11 +174,11 @@ class _TomorrowSectionState extends State<TomorrowSection> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  Icon(Icons.error_outline, size: 64, color: scheme.error),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Failed to load tasks',
-                    style: TextStyle(fontSize: 18),
+                    style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton(
@@ -194,8 +197,8 @@ class _TomorrowSectionState extends State<TomorrowSection> {
       return RefreshIndicator(
         onRefresh: _refresh,
         child: ListView(
-          children: const [
-            SizedBox(height: 100),
+          children: [
+            const SizedBox(height: 100),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -203,16 +206,18 @@ class _TomorrowSectionState extends State<TomorrowSection> {
                   Icon(
                     Icons.check_circle_outline,
                     size: 64,
-                    color: Colors.grey,
+                    color: scheme.onSurfaceVariant,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     'No tasks for tomorrow',
-                    style: TextStyle(fontSize: 18),
+                    style: theme.textTheme.titleMedium,
                   ),
                   Text(
                     'Pull down to refresh',
-                    style: TextStyle(color: Colors.grey),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -364,7 +369,7 @@ class _TomorrowSectionState extends State<TomorrowSection> {
               ),
             ],
           ),
-          Divider(color: Colors.grey[300]),
+          const Divider(),
 
           ListView.builder(
             padding: const EdgeInsets.only(top: 8),
@@ -386,10 +391,15 @@ class _TomorrowSectionState extends State<TomorrowSection> {
                   if (success) {
                     await _loadTodos();
                   } else {
+                    final s = Theme.of(context).colorScheme;
                     messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('Failed to delete todo. Try again.'),
-                        backgroundColor: Colors.red,
+                      SnackBar(
+                        content: Text(
+                          'Failed to delete todo. Try again.',
+                          style: TextStyle(color: s.onError),
+                        ),
+                        backgroundColor: s.error,
+                        behavior: SnackBarBehavior.floating,
                       ),
                     );
                   }

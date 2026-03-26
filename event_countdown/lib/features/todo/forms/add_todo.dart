@@ -33,10 +33,15 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   Future<void> _addTask() async {
     // Validate input
     if (_taskNameController.text.trim().isEmpty) {
+      final s = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a task name'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: Text(
+            'Please enter a task name',
+            style: TextStyle(color: s.onError),
+          ),
+          backgroundColor: s.error,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -65,10 +70,15 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
         );
         Navigator.of(context).pop(newTodo);
       } else {
+        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please sign in to add tasks.'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: Text(
+              'Please sign in to add tasks.',
+              style: TextStyle(color: s.onError),
+            ),
+            backgroundColor: s.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -77,10 +87,12 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
         final message = e is Exception
             ? e.toString().replaceFirst('Exception: ', '')
             : e.toString();
+        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(message),
-            backgroundColor: Theme.of(context).colorScheme.error,
+            content: Text(message, style: TextStyle(color: s.onError)),
+            backgroundColor: s.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }

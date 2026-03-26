@@ -96,22 +96,25 @@ class _GuestTodoScreenState extends State<GuestTodoScreen> {
   Future<void> _confirmDeleteTodo(GuestTodoSummary todo) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete task'),
-        content: Text(
-          'Delete "${todo.title}" and all its pomodoro sessions on this device?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+      builder: (dialogContext) {
+        final s = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          title: const Text('Delete task'),
+          content: Text(
+            'Delete "${todo.title}" and all its pomodoro sessions on this device?',
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text('Delete', style: TextStyle(color: s.error)),
+            ),
+          ],
+        );
+      },
     );
     if (ok == true && mounted) {
       await _store?.deleteTodo(todo.id);
@@ -227,7 +230,7 @@ class _GuestTodoScreenState extends State<GuestTodoScreen> {
               ),
             ],
           ),
-          Divider(color: Colors.grey[300]),
+          const Divider(),
           ListView.builder(
             padding: const EdgeInsets.only(top: 8),
             itemCount: todos.length,
@@ -258,6 +261,9 @@ class _GuestTodoScreenState extends State<GuestTodoScreen> {
   }
 
   Widget _buildBody() {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -272,9 +278,9 @@ class _GuestTodoScreenState extends State<GuestTodoScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  Icon(Icons.error_outline, size: 64, color: scheme.error),
                   const SizedBox(height: 16),
-                  const Text('Failed to load', style: TextStyle(fontSize: 18)),
+                  Text('Failed to load', style: theme.textTheme.titleMedium),
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: _loadData,
@@ -292,8 +298,8 @@ class _GuestTodoScreenState extends State<GuestTodoScreen> {
       return RefreshIndicator(
         onRefresh: _refresh,
         child: ListView(
-          children: const [
-            SizedBox(height: 100),
+          children: [
+            const SizedBox(height: 100),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -301,13 +307,15 @@ class _GuestTodoScreenState extends State<GuestTodoScreen> {
                   Icon(
                     Icons.check_circle_outline,
                     size: 64,
-                    color: Colors.grey,
+                    color: scheme.onSurfaceVariant,
                   ),
-                  SizedBox(height: 16),
-                  Text('No local tasks', style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 16),
+                  Text('No local tasks', style: theme.textTheme.titleMedium),
                   Text(
                     'Pull down to refresh',
-                    style: TextStyle(color: Colors.grey),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),

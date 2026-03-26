@@ -24,7 +24,6 @@ class _AppLayoutState extends State<AppLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

@@ -1,19 +1,18 @@
-
-import 'package:event_countdown/app/theme.dart';
 import 'package:flutter/material.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
 
-
-
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Drawer(
       child: Column(
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(color: AppColors.primary),
+            decoration: BoxDecoration(color: scheme.primary),
             child: SizedBox(
               width: double.infinity,
               child: Column(
@@ -22,22 +21,22 @@ class LeftDrawer extends StatelessWidget {
                 children: [
                   Text(
                     'Functions',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: scheme.onPrimary.withValues(alpha: 0.85),
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.list),
-            title: const Text('Routines'),
+          const ListTile(
+            leading: Icon(Icons.list),
+            title: Text('Routines'),
           ),
-          ListTile(
-            leading: const Icon(Icons.event),
-            title: const Text('Success Criteria'),
+          const ListTile(
+            leading: Icon(Icons.event),
+            title: Text('Success Criteria'),
           ),
         ],
       ),
