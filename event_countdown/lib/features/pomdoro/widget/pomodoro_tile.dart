@@ -1,20 +1,17 @@
 import 'dart:async';
 
 import 'package:event_countdown/app/theme.dart';
-
 import 'package:event_countdown/features/models/pomdoro_model.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_repository.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-/// Displays a single pomodoro session with a live countdown driven by the
-/// server-side [startedAt] timestamp.
+/// Displays a single pomodoro session as a clean subtask card.
 ///
-/// When the user taps "Start", the service writes a timestamp to DynamoDB.
-/// A local ticker recalculates remaining = duration - (now - startedAt) every
-/// second. If the app is reopened while the timer is running the countdown
-/// automatically resumes because elapsed is derived from the persisted timestamp.
+/// Tap to start/pause (when not completed). Swipe for reset, complete, delete.
+/// Timer logic is self-contained: a local ticker recalculates remaining time
+/// from the server-side [startedAt] timestamp every second.
 class PomodoroTile extends StatefulWidget {
   const PomodoroTile({
     super.key,
@@ -43,7 +40,6 @@ class PomodoroTile extends StatefulWidget {
 
 class _PomodoroTileState extends State<PomodoroTile> {
   late Pomodoro _pomodoro;
-  //when in guest mode, use GuestLocalFocusStore but when signed in, use PomodoroService
 
   PomodoroRepository get _repository => widget.repository ?? PomodoroService();
   Timer? _ticker;
@@ -77,7 +73,6 @@ class _PomodoroTileState extends State<PomodoroTile> {
     super.dispose();
   }
 
-  /// Start or resume the local ticker based on the current model state.
   void _syncTimer() {
     _ticker?.cancel();
     _ticker = null;
@@ -127,14 +122,9 @@ class _PomodoroTileState extends State<PomodoroTile> {
     } else {
       setState(() => _isStarting = false);
       if (mounted) {
-        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to start timer. Try again.',
-              style: TextStyle(color: s.onError),
-            ),
-            backgroundColor: s.error,
+          const SnackBar(
+            content: Text('Failed to start timer. Try again.'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -165,14 +155,9 @@ class _PomodoroTileState extends State<PomodoroTile> {
     } else {
       setState(() => _isPausing = false);
       if (mounted) {
-        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to pause timer. Try again.',
-              style: TextStyle(color: s.onError),
-            ),
-            backgroundColor: s.error,
+          const SnackBar(
+            content: Text('Failed to pause timer. Try again.'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -203,14 +188,9 @@ class _PomodoroTileState extends State<PomodoroTile> {
     } else {
       setState(() => _isResetting = false);
       if (mounted) {
-        final s = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to reset timer. Try again.',
-              style: TextStyle(color: s.onError),
-            ),
-            backgroundColor: s.error,
+          const SnackBar(
+            content: Text('Failed to reset timer. Try again.'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -237,7 +217,6 @@ class _PomodoroTileState extends State<PomodoroTile> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
-        final s = Theme.of(dialogContext).colorScheme;
         return AlertDialog(
           title: const Text('Delete Pomodoro'),
           content: const Text('Are you sure you want to delete this session?'),
@@ -248,7 +227,12 @@ class _PomodoroTileState extends State<PomodoroTile> {
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text('Delete', style: TextStyle(color: s.error)),
+              child: Text(
+                'Delete',
+                style: TextStyle(
+                  color: Theme.of(dialogContext).colorScheme.error,
+                ),
+              ),
             ),
           ],
         );
@@ -259,110 +243,31 @@ class _PomodoroTileState extends State<PomodoroTile> {
     }
   }
 
+  void _handleTap() {
+    if (_pomodoro.isCompleted) return;
+    if (_pomodoro.isRunning) {
+      _handlePause();
+    } else {
+      _handleStart();
+    }
+  }
+
   static String _formatDuration(Duration d) {
     final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
-  Widget _buildLoadingIndicator() {
-    return const SizedBox(
-      width: 24,
-      height: 24,
-      child: CircularProgressIndicator(strokeWidth: 2),
-    );
-  }
-
-  Widget? _buildTrailing({
-    required bool notStarted,
-    required bool isRunning,
-    required bool isStopped,
-  }) {
-    if (notStarted) {
-      return _isStarting
-          ? _buildLoadingIndicator()
-          : IconButton(
-              icon: const Icon(Icons.play_arrow),
-              onPressed: _handleStart,
-            );
-    }
-    if (isStopped) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _isStarting
-              ? _buildLoadingIndicator()
-              : IconButton(
-                  icon: const Icon(Icons.play_arrow),
-                  onPressed: _handleStart,
-                ),
-          _isResetting
-              ? _buildLoadingIndicator()
-              : IconButton(
-                  icon: const Icon(Icons.restart_alt),
-                  onPressed: _handleReset,
-                ),
-        ],
-      );
-    }
-    if (isRunning) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _isPausing
-              ? _buildLoadingIndicator()
-              : IconButton(
-                  icon: const Icon(Icons.pause),
-                  onPressed: _handlePause,
-                ),
-          _isResetting
-              ? _buildLoadingIndicator()
-              : IconButton(
-                  icon: const Icon(Icons.restart_alt),
-                  onPressed: _handleReset,
-                ),
-        ],
-      );
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final sem = theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
-    final isRunning = _pomodoro.isRunning;
-    final isStopped = _pomodoro.isStopped;
     final isCompleted = _pomodoro.isCompleted;
-    final notStarted = isStopped && _pomodoro.elapsedSeconds == 0;
-
-    final IconData icon;
-    final Color iconColor;
-    if (isCompleted) {
-      icon = Icons.check_circle;
-      iconColor = sem.pomodoroComplete;
-    } else if (isRunning) {
-      icon = Icons.timer;
-      iconColor = scheme.primary;
-    } else if (isStopped && _pomodoro.elapsedSeconds > 0) {
-      icon = Icons.pause_circle;
-      iconColor = sem.pomodoroReset;
-    } else {
-      icon = Icons.circle_outlined;
-      iconColor = sem.pomodoroIdle;
-    }
-
-    final String subtitle;
-    if (isCompleted) {
-      subtitle = 'Completed';
-    } else if (isRunning) {
-      subtitle = '${_formatDuration(_remaining)} remaining';
-    } else if (isStopped && _pomodoro.elapsedSeconds > 0) {
-      subtitle = '${_formatDuration(_remaining)} remaining · Paused';
-    } else {
-      subtitle = '${_pomodoro.timerDurationInMinutes} min';
-    }
+    final isRunning = _pomodoro.isRunning;
+    final isPaused = _pomodoro.isStopped && _pomodoro.elapsedSeconds > 0;
+    final isLoading = _isStarting || _isPausing || _isResetting;
 
     return Slidable(
       key: ValueKey(_pomodoro.id),
@@ -375,7 +280,6 @@ class _PomodoroTileState extends State<PomodoroTile> {
               backgroundColor: sem.pomodoroReset,
               foregroundColor: sem.onPomodoroAccent,
               icon: Icons.restart_alt,
-              // label: 'Reset',
             ),
           if (!isCompleted)
             SlidableAction(
@@ -383,28 +287,116 @@ class _PomodoroTileState extends State<PomodoroTile> {
               backgroundColor: sem.pomodoroComplete,
               foregroundColor: sem.onPomodoroAccent,
               icon: Icons.check,
-              // label: 'Complete',
             ),
           if (widget.onDeleted != null)
             SlidableAction(
               onPressed: (_) => _confirmDelete(),
-              backgroundColor: scheme.error,
-              foregroundColor: scheme.onError,
+              backgroundColor: const Color(0xFFEF5350),
+              foregroundColor: Colors.white,
               icon: Icons.delete,
-              // label: 'Delete',
             ),
         ],
       ),
-      child: ListTile(
-        leading: Icon(icon, size: 40, color: iconColor),
-        title: Text(_pomodoro.title),
-        subtitle: Text(subtitle, style: theme.textTheme.bodySmall),
-        trailing: _buildTrailing(
-          notStarted: notStarted,
-          isRunning: isRunning,
-          isStopped: isStopped,
+      child: GestureDetector(
+        onTap: _handleTap,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              _buildStatusIcon(
+                isCompleted: isCompleted,
+                isRunning: isRunning,
+                isPaused: isPaused,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  _pomodoro.title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: isCompleted
+                        ? scheme.onSurfaceVariant
+                        : scheme.onSurface,
+                    decoration: isCompleted
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
+                    decorationColor: scheme.onSurfaceVariant.withValues(
+                      alpha: 0.4,
+                    ),
+                  ),
+                ),
+              ),
+              if (isLoading) ...[
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: scheme.primary,
+                  ),
+                ),
+              ] else if (isRunning || isPaused) ...[
+                const SizedBox(width: 8),
+                Text(
+                  _formatDuration(_remaining),
+                  style: textTheme.bodySmall?.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildStatusIcon({
+    required bool isCompleted,
+    required bool isRunning,
+    required bool isPaused,
+  }) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final sem = theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final IconData icon;
+    final Color bgColor;
+    final Color iconColor;
+
+    if (isCompleted) {
+      icon = Icons.check_circle;
+      bgColor = sem.pomodoroComplete.withValues(alpha: 0.15);
+      iconColor = sem.pomodoroComplete;
+    } else if (isRunning) {
+      icon = Icons.timer;
+      bgColor = scheme.primary.withValues(alpha: 0.14);
+      iconColor = scheme.primary;
+    } else if (isPaused) {
+      icon = Icons.pause_circle_outline;
+      bgColor = sem.pomodoroReset.withValues(alpha: 0.15);
+      iconColor = sem.pomodoroReset;
+    } else {
+      icon = Icons.circle_outlined;
+      bgColor = sem.pomodoroIdle.withValues(alpha: 0.15);
+      iconColor = sem.pomodoroIdle;
+    }
+
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Center(child: Icon(icon, size: 18, color: iconColor)),
     );
   }
 }

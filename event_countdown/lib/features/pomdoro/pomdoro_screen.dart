@@ -1,4 +1,5 @@
 import 'package:event_countdown/features/pomdoro/forms/pomodoro_form.dart';
+import 'package:event_countdown/features/pomdoro/pomodoro_screen_widgets.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_repository.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
 import 'package:event_countdown/features/pomdoro/widget/pomodoro_tile.dart';
@@ -24,8 +25,7 @@ class PomodoroScreen extends StatefulWidget {
 }
 
 class _PomodoroScreenState extends State<PomodoroScreen> {
-  PomodoroRepository get _repository =>
-      widget.repository ?? PomodoroService();
+  PomodoroRepository get _repository => widget.repository ?? PomodoroService();
 
   List<Pomodoro> _pomodoros = [];
   bool _isLoading = true;
@@ -36,6 +36,8 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
     super.initState();
     _loadPomodoros();
   }
+
+  int get _completedCount => _pomodoros.where((p) => p.isCompleted).length;
 
   Future<void> _loadPomodoros() async {
     final todoId = widget.todoId;
@@ -73,14 +75,9 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
   Future<void> _openAddPomodoroSheet() async {
     final todoId = widget.todoId ?? '';
     if (todoId.isEmpty) {
-      final s = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'No task selected. Open Pomodoro from a task.',
-            style: TextStyle(color: s.onError),
-          ),
-          backgroundColor: s.error,
+        const SnackBar(
+          content: Text('No task selected. Open Pomodoro from a task.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -104,34 +101,76 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title ?? 'Task'), centerTitle: true),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openAddPomodoroSheet,
-        child: const Icon(Icons.add),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      floatingActionButton: PomodoroFab(onPressed: _openAddPomodoroSheet),
+      body: SafeArea(
+        child: Column(
+          children: [
+            PomodoroScreenTopBar(onBack: () => Navigator.of(context).pop()),
+            Expanded(child: _buildMainContent(context)),
+          ],
+        ),
       ),
-      body: _buildBody(context),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
+  Widget _buildMainContent(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: CircularProgressIndicator(color: scheme.primary));
     }
 
     if (_error != null) {
-      return Center(
+      return _buildErrorState(context);
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadPomodoros,
+      color: scheme.primary,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 8),
+          PomodoroSessionHeader(title: widget.title ?? 'Task'),
+          const SizedBox(height: 32),
+          PomodoroTimerSection(
+            timeDisplay: _timerUiState.timeDisplay,
+            statusText: _timerUiState.statusText,
+            progress: _timerUiState.progress,
+            isRunning: _timerUiState.isRunning,
+            onPrimaryButtonPressed: () {
+              // TODO: Timer start/pause — user will implement
+            },
+          ),
+          const SizedBox(height: 40),
+          PomodoroSubtasksHeader(
+            completedCount: _completedCount,
+            totalCount: _pomodoros.length,
+          ),
+          const SizedBox(height: 16),
+          ..._buildSubtaskCards(),
+          const SizedBox(height: 100),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.info_outline,
               size: 64,
-              color: scheme.onSurfaceVariant,
+              color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
             ),
             const SizedBox(height: 16),
             Text(
@@ -147,85 +186,100 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
               ),
           ],
         ),
-      );
-    }
-
-    if (_pomodoros.isEmpty) {
-      return RefreshIndicator(
-        onRefresh: _loadPomodoros,
-        child: ListView(
-          children: [
-            const SizedBox(height: 100),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.timer_outlined,
-                    size: 64,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No pomodoros yet',
-                    style: textTheme.titleMedium?.copyWith(fontSize: 18),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap + to add one',
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: _loadPomodoros,
-      child: ListView.builder(
-        padding: const EdgeInsets.only(top: 8),
-        itemCount: _pomodoros.length,
-        itemBuilder: (context, index) {
-          final pomodoro = _pomodoros[index];
-          return PomodoroTile(
-            key: ValueKey(pomodoro.id),
-            pomodoro: pomodoro,
-            todoId: widget.todoId!,
-            repository: widget.repository,
-            onCompleted: _loadPomodoros, // reloads list
-            onDeleted: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              final snackScheme = Theme.of(context).colorScheme;
-              final removed = _pomodoros[index];
-              setState(() => _pomodoros.removeAt(index));
-
-              final success = await _repository.deletePomodoro(
-                pomodoroId: pomodoro.id,
-                todoId: widget.todoId!,
-              );
-
-              if (!success && mounted) {
-                setState(() => _pomodoros.insert(index, removed));
-                messenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Failed to delete pomodoro',
-                      style: TextStyle(color: snackScheme.onError),
-                    ),
-                    backgroundColor: snackScheme.error,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              }
-            },
-          );
-        },
       ),
     );
+  }
+
+  PomodoroTimerUiState get _timerUiState {
+    String timeDisplay = '25:00';
+    String statusText = 'Ready';
+    double progress = 0.0;
+    bool isRunning = false;
+
+    final running = _pomodoros.cast<Pomodoro?>().firstWhere(
+      (p) => p!.isRunning,
+      orElse: () => null,
+    );
+
+    if (running != null) {
+      timeDisplay = _formatDuration(running.remaining);
+      statusText = 'Focusing...';
+      isRunning = true;
+      final total = running.totalDuration;
+      if (total.inSeconds > 0) {
+        progress = 1.0 - (running.remaining.inSeconds / total.inSeconds);
+      }
+    } else if (_pomodoros.isNotEmpty) {
+      final first = _pomodoros.cast<Pomodoro?>().firstWhere(
+        (p) => p!.isStopped,
+        orElse: () => _pomodoros.first,
+      );
+      if (first != null) {
+        timeDisplay = _formatDuration(first.remaining);
+        if (first.isCompleted) {
+          statusText = 'Completed';
+          progress = 1.0;
+        } else if (first.elapsedSeconds > 0) {
+          statusText = 'Paused';
+          final total = first.totalDuration;
+          if (total.inSeconds > 0) {
+            progress = 1.0 - (first.remaining.inSeconds / total.inSeconds);
+          }
+        }
+      }
+    }
+
+    return PomodoroTimerUiState(
+      timeDisplay: timeDisplay,
+      statusText: statusText,
+      progress: progress,
+      isRunning: isRunning,
+    );
+  }
+
+  List<Widget> _buildSubtaskCards() {
+    if (_pomodoros.isEmpty) {
+      return [const SizedBox(height: 32), const PomodoroEmptySubtasks()];
+    }
+
+    return List.generate(_pomodoros.length, (index) {
+      final pomodoro = _pomodoros[index];
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: PomodoroTile(
+          key: ValueKey(pomodoro.id),
+          pomodoro: pomodoro,
+          todoId: widget.todoId!,
+          repository: widget.repository,
+          onCompleted: _loadPomodoros,
+          onDeleted: () async {
+            final messenger = ScaffoldMessenger.of(context);
+            final removed = _pomodoros[index];
+            setState(() => _pomodoros.removeAt(index));
+
+            final success = await _repository.deletePomodoro(
+              pomodoroId: pomodoro.id,
+              todoId: widget.todoId!,
+            );
+
+            if (!success && mounted) {
+              setState(() => _pomodoros.insert(index, removed));
+              messenger.showSnackBar(
+                const SnackBar(
+                  content: Text('Failed to delete pomodoro'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
+        ),
+      );
+    });
+  }
+
+  static String _formatDuration(Duration d) {
+    final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 }

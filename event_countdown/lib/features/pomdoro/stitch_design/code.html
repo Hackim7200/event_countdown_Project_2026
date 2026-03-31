@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#365f82",
+            "secondary-fixed": "#d5e4f6",
+            "surface-bright": "#f7f9fb",
+            "error-container": "#ffdad6",
+            "primary-fixed": "#cde5ff",
+            "on-secondary-container": "#576675",
+            "on-error": "#ffffff",
+            "inverse-surface": "#2d3133",
+            "on-secondary-fixed-variant": "#3a4856",
+            "tertiary-fixed": "#ffddb4",
+            "surface-container-high": "#e6e8ea",
+            "on-secondary-fixed": "#0e1d2a",
+            "surface-container-low": "#f2f4f6",
+            "secondary-container": "#d5e4f6",
+            "on-primary": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-fixed": "#001d32",
+            "error": "#ba1a1a",
+            "surface": "#f7f9fb",
+            "secondary-fixed-dim": "#b9c8d9",
+            "on-primary-fixed-variant": "#1e4a6b",
+            "on-background": "#191c1e",
+            "outline": "#72777e",
+            "background": "#f7f9fb",
+            "on-surface-variant": "#42474e",
+            "on-primary-container": "#fdfcff",
+            "tertiary-fixed-dim": "#f0be7b",
+            "outline-variant": "#c2c7ce",
+            "primary-container": "#50789c",
+            "on-tertiary-fixed-variant": "#624007",
+            "primary-fixed-dim": "#a2cbf2",
+            "tertiary": "#7a551c",
+            "surface-variant": "#e0e3e5",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#fffbff",
+            "surface-dim": "#d8dadc",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed": "#291800",
+            "tertiary-container": "#956d32",
+            "surface-container-highest": "#e0e3e5",
+            "surface-container": "#eceef0",
+            "secondary": "#51606f",
+            "inverse-on-surface": "#eff1f3",
+            "on-surface": "#191c1e",
+            "inverse-primary": "#a2cbf2",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#396284"
+          },
+          fontFamily: {
+            "headline": ["Manrope"],
+            "body": ["Manrope"],
+            "label": ["Manrope"]
+          },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    body { font-family: 'Manrope', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .timer-shadow {
+      box-shadow: 0 8px 32px rgba(25, 28, 30, 0.04);
+    }
+    .fab-shadow {
+      box-shadow: 0 8px 24px rgba(54, 95, 130, 0.2);
+    }
+    .glass-nav {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f7f9fb]/80 backdrop-blur-md flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#365f82] active:scale-95 duration-200" data-icon="arrow_back">arrow_back</button>
+</div>
+<h1 class="text-lg font-bold text-[#191c1e] font-manrope">Task Focus</h1>
+<div class="flex items-center">
+<button class="material-symbols-outlined text-[#365f82] active:scale-95 duration-200" data-icon="more_vert">more_vert</button>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto">
+<!-- Centered Headline -->
+<div class="text-center mb-10">
+<p class="text-secondary text-sm font-medium tracking-wide mb-2">CURRENT SESSION</p>
+<h2 class="text-3xl font-extrabold text-on-surface tracking-tight">Complete FYP Project</h2>
+</div>
+<!-- Timer Section -->
+<div class="flex flex-col items-center mb-12">
+<div class="w-full aspect-square max-w-[320px] bg-surface-container-lowest rounded-full timer-shadow flex items-center justify-center relative overflow-hidden">
+<!-- Visual progress ring (Decorative) -->
+<svg class="absolute inset-0 w-full h-full -rotate-90" viewbox="0 0 100 100">
+<circle class="text-surface-container" cx="50" cy="50" fill="none" r="48" stroke="currentColor" stroke-width="1.5"></circle>
+<circle class="text-primary" cx="50" cy="50" fill="none" r="48" stroke="currentColor" stroke-dasharray="301.59" stroke-dashoffset="240" stroke-width="2"></circle>
+</svg>
+<div class="text-center z-10">
+<span class="text-7xl font-bold text-on-surface tracking-tighter">03:36</span>
+<p class="text-secondary font-medium mt-1">Focusing...</p>
+</div>
+</div>
+<!-- Start Button -->
+<button class="mt-10 px-12 py-4 bg-[#E07A5F] text-white rounded-xl font-bold text-lg hover:opacity-90 active:scale-95 transition-all timer-shadow">
+        Start
+      </button>
+</div>
+<!-- Subtasks List -->
+<div class="space-y-4">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-lg font-bold text-on-surface">Subtasks</h3>
+<span class="text-sm font-medium text-secondary">1/3 Completed</span>
+</div>
+<!-- Subtask Card 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg flex items-center gap-4 group transition-all">
+<div class="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="flex-1 font-medium text-on-surface line-through decoration-secondary/40 text-secondary">Read the research paper</span>
+</div>
+<!-- Subtask Card 2 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg flex items-center gap-4 group transition-all">
+<div class="w-6 h-6 rounded-md bg-secondary-fixed flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">circle</span>
+</div>
+<span class="flex-1 font-medium text-on-surface">Code the project</span>
+</div>
+<!-- Subtask Card 3 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg flex items-center gap-4 group transition-all">
+<div class="w-6 h-6 rounded-md bg-secondary-fixed flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">circle</span>
+</div>
+<span class="flex-1 font-medium text-on-surface">Submit the project</span>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-white rounded-2xl fab-shadow flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full rounded-t-2xl z-50 bg-white/80 backdrop-blur-lg border-t border-[#c2c7ce]/15 shadow-[0_-8px_24px_rgba(25,28,30,0.04)] flex justify-around items-center h-20 px-4 pb-safe">
+<div class="flex flex-col items-center justify-center text-[#365f82] relative after:content-[''] after:absolute after:bottom-[-4px] after:w-1 after:h-1 after:bg-[#365f82] after:rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="font-manrope text-[11px] font-medium">Focus</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#51606f]">
+<span class="material-symbols-outlined">checklist</span>
+<span class="font-manrope text-[11px] font-medium">Tasks</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#51606f]">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-manrope text-[11px] font-medium">Stats</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#51606f]">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-manrope text-[11px] font-medium">Settings</span>
+</div>
+</nav>
+</body></html>

@@ -16,6 +16,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.pomodoroComplete,
     required this.pomodoroReset,
     required this.pomodoroIdle,
+    required this.pomodoroStopButton,
     required this.onPomodoroAccent,
   });
 
@@ -23,6 +24,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     pomodoroComplete: _LightPalette.pomodoroComplete,
     pomodoroReset: Color(0xFFFF9800),
     pomodoroIdle: _LightPalette.pomodoroIdle,
+    pomodoroStopButton: Color(0xFFE07A5F),
     onPomodoroAccent: Colors.white,
   );
 
@@ -30,12 +32,14 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     pomodoroComplete: Color(0xFF66BB6A),
     pomodoroReset: Color(0xFFFFB74D),
     pomodoroIdle: Color(0xFFFF8A80),
+    pomodoroStopButton: Color(0xFFFF8A70),
     onPomodoroAccent: Color(0xFF0D141C),
   );
 
   final Color pomodoroComplete;
   final Color pomodoroReset;
   final Color pomodoroIdle;
+  final Color pomodoroStopButton;
   final Color onPomodoroAccent;
 
   @override
@@ -43,12 +47,14 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? pomodoroComplete,
     Color? pomodoroReset,
     Color? pomodoroIdle,
+    Color? pomodoroStopButton,
     Color? onPomodoroAccent,
   }) {
     return AppSemanticColors(
       pomodoroComplete: pomodoroComplete ?? this.pomodoroComplete,
       pomodoroReset: pomodoroReset ?? this.pomodoroReset,
       pomodoroIdle: pomodoroIdle ?? this.pomodoroIdle,
+      pomodoroStopButton: pomodoroStopButton ?? this.pomodoroStopButton,
       onPomodoroAccent: onPomodoroAccent ?? this.onPomodoroAccent,
     );
   }
@@ -64,6 +70,11 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       )!,
       pomodoroReset: Color.lerp(pomodoroReset, other.pomodoroReset, t)!,
       pomodoroIdle: Color.lerp(pomodoroIdle, other.pomodoroIdle, t)!,
+      pomodoroStopButton: Color.lerp(
+        pomodoroStopButton,
+        other.pomodoroStopButton,
+        t,
+      )!,
       onPomodoroAccent: Color.lerp(
         onPomodoroAccent,
         other.onPomodoroAccent,
