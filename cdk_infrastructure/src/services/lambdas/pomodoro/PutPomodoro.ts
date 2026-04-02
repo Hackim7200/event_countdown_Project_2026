@@ -7,6 +7,7 @@ import {
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { parseJson } from "../../shared/Utils";
+import { notifyUser } from "../../shared/WebSocketNotifier";
 
 /**
  * Handles PUT /pomodoros to update a pomodoro's timer state.
@@ -97,6 +98,16 @@ export async function putPomodoro(
       }),
     );
 
+    await notifyUser(
+      userId,
+      {
+        type: "pomodoro_update",
+        action: "started",
+        data: { pomodoroId, todoId, startedAt: now, status: "running" },
+      },
+      ddbClient,
+    );
+
     return {
       statusCode: 200,
       body: JSON.stringify({ startedAt: now, status: "running" }),
@@ -143,6 +154,16 @@ export async function putPomodoro(
       }),
     );
 
+    await notifyUser(
+      userId,
+      {
+        type: "pomodoro_update",
+        action: "paused",
+        data: { pomodoroId, todoId, elapsedSeconds: newElapsed, status: "stopped" },
+      },
+      ddbClient,
+    );
+
     return {
       statusCode: 200,
       body: JSON.stringify({ elapsedSeconds: newElapsed, status: "stopped" }),
@@ -177,6 +198,16 @@ export async function putPomodoro(
           ":status": { S: "stopped" },
         },
       }),
+    );
+
+    await notifyUser(
+      userId,
+      {
+        type: "pomodoro_update",
+        action: "reset",
+        data: { pomodoroId, todoId, elapsedSeconds: 0, status: "stopped" },
+      },
+      ddbClient,
     );
 
     return {
@@ -214,6 +245,16 @@ export async function putPomodoro(
           ":status": { S: "completed" },
         },
       }),
+    );
+
+    await notifyUser(
+      userId,
+      {
+        type: "pomodoro_update",
+        action: "completed",
+        data: { pomodoroId, todoId, status: "completed" },
+      },
+      ddbClient,
     );
 
     return {

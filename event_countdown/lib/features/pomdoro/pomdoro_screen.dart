@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:event_countdown/features/pomdoro/forms/pomodoro_form.dart';
 import 'package:event_countdown/features/pomdoro/pomodoro_screen_widgets.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_repository.dart';
 import 'package:event_countdown/features/pomdoro/services/pomodoro_service.dart';
+import 'package:event_countdown/core/services/websocket_service.dart';
 import 'package:event_countdown/features/pomdoro/widget/pomodoro_tile.dart';
 import 'package:event_countdown/features/models/pomdoro_model.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +34,37 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
   bool _isLoading = true;
   String? _error;
 
+  WebSocketService? _wsService;
+  StreamSubscription<WsEvent>? _wsSub;
+
+  bool get _isCloudMode => widget.repository == null;
+
   @override
   void initState() {
     super.initState();
     _loadPomodoros();
+    if (_isCloudMode) _connectWebSocket();
+  }
+
+  @override
+  void dispose() {
+    _wsSub?.cancel();
+    _wsService?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _connectWebSocket() async {
+    _wsService = WebSocketService();
+    await _wsService!.connect();
+
+    _wsSub = _wsService!.events
+        .where((e) => e.type == 'pomodoro_update')
+        .listen((event) {
+      final todoId = event.data['todoId'] as String?;
+      if ((todoId == null || todoId == widget.todoId) && mounted) {
+        _loadPomodoros();
+      }
+    });
   }
 
   int get _completedCount => _pomodoros.where((p) => p.isCompleted).length;

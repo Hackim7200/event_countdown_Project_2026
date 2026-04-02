@@ -3,6 +3,7 @@ import {
   DynamoDBClient,
 } from "@aws-sdk/client-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { notifyUser } from "../../shared/WebSocketNotifier";
 
 export async function deletePomodoro(
   event: APIGatewayProxyEvent,
@@ -31,6 +32,16 @@ export async function deletePomodoro(
         SK: { S: SK },
       },
     }),
+  );
+
+  await notifyUser(
+    userId,
+    {
+      type: "pomodoro_update",
+      action: "deleted",
+      data: { pomodoroId, todoId },
+    },
+    ddbClient,
   );
 
   return {

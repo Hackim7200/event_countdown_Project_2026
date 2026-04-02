@@ -4,6 +4,7 @@ import { v4 } from "uuid";
 import { validateAsPomodoroEntry } from "../../validators/PomodoroValidator";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { parseJson } from "../../shared/Utils";
+import { notifyUser } from "../../shared/WebSocketNotifier";
 
 export async function postPomodoro(
   event: APIGatewayProxyEvent,
@@ -31,8 +32,6 @@ export async function postPomodoro(
     elapsedSeconds: 0,
   };
 
-
-
   await ddbClient.send(
     new PutItemCommand({
       TableName: process.env.TABLE_NAME, // Defined in LambdaStack.ts.
@@ -45,6 +44,23 @@ export async function postPomodoro(
   //   title: { S: item.title },
   //   year: { N: item.year },
   // },
+
+  await notifyUser(
+    body.userId,
+    {
+      type: "pomodoro_update",
+      action: "created",
+      data: {
+        id: itemId,
+        todoId: body.todoId,
+        title: body.title,
+        status: "stopped",
+        timerDurationInMinutes: body.timerDurationInMinutes,
+        elapsedSeconds: 0,
+      },
+    },
+    ddbClient,
+  );
 
   return {
     statusCode: 201,

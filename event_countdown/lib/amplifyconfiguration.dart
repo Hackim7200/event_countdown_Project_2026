@@ -12,15 +12,15 @@ const String amplifyconfig = '''
         "CredentialsProvider": {
           "CognitoIdentity": {
             "Default": {
-              "PoolId": "eu-west-2:81e178f1-945f-46d5-a94c-0adb84e89e23",
+              "PoolId": "eu-west-2:477a8f38-276f-43a8-8e7c-bb09bf6dea5b",
               "Region": "eu-west-2"
             }
           }
         },
         "CognitoUserPool": {
           "Default": {
-            "PoolId": "eu-west-2_U0OXGdkaY",
-            "AppClientId": "7m3em2vnkscbbncl5b1irjrmkp",
+            "PoolId": "eu-west-2_z0Re9MH7Y",
+            "AppClientId": "2496ol99l0u1cl90417qredkc2",
             "Region": "eu-west-2"
           }
         },
@@ -47,7 +47,7 @@ const String amplifyconfig = '''
       "awsAPIPlugin": {
         "CountdownApi": {
           "endpointType": "REST",
-          "endpoint": "https://2do4idj139.execute-api.eu-west-2.amazonaws.com/prod/",
+          "endpoint": "https://zodi0oj39l.execute-api.eu-west-2.amazonaws.com/prod/",
           "region": "eu-west-2",
           "authorizationType": "AMAZON_COGNITO_USER_POOLS"
         }
@@ -56,3 +56,4 @@ const String amplifyconfig = '''
   }
 }
 ''';
+// datastack is not added here since its accessed via lambda apigateway

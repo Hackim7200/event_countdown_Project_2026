@@ -11,6 +11,7 @@ import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 
 interface LambdaStackProps extends StackProps {
   userItemsTable: ITable;
+  connectionsTable: ITable;
 }
 
 export class LambdaStack extends Stack {
@@ -18,6 +19,7 @@ export class LambdaStack extends Stack {
   public readonly todosLambdaIntegration: LambdaIntegration;
   public readonly pomodorosLambdaIntegration: LambdaIntegration;
   public readonly profileLambdaIntegration: LambdaIntegration;
+  public readonly pomodorosLambda: NodejsFunction;
 
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props);
@@ -96,6 +98,8 @@ export class LambdaStack extends Stack {
 
     //////////// Pomodoros Lambda ////////////
 
+    const connectionsTable = props.connectionsTable;
+
     const pomodorosLambda = new NodejsFunction(this, "PomodorosLambda", {
       runtime: Runtime.NODEJS_20_X,
       handler: "handler",
@@ -110,6 +114,7 @@ export class LambdaStack extends Stack {
       ),
       environment: {
         TABLE_NAME: table.tableName,
+        CONNECTIONS_TABLE_NAME: connectionsTable.tableName,
       },
     });
     pomodorosLambda.addToRolePolicy(
@@ -126,6 +131,17 @@ export class LambdaStack extends Stack {
         ],
       }),
     );
+    pomodorosLambda.addToRolePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        resources: [
+          connectionsTable.tableArn,
+          `${connectionsTable.tableArn}/index/*`,
+        ],
+        actions: ["dynamodb:Query", "dynamodb:DeleteItem"],
+      }),
+    );
+    this.pomodorosLambda = pomodorosLambda;
     this.pomodorosLambdaIntegration = new LambdaIntegration(pomodorosLambda);
 
     // Profile Lambda

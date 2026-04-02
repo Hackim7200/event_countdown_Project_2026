@@ -17,6 +17,9 @@ interface WebSocketStackProps extends StackProps {
 }
 
 export class WebSocketStack extends Stack {
+  public readonly callbackUrl: string;
+  public readonly manageConnectionsArn: string;
+
   constructor(scope: Construct, id: string, props: WebSocketStackProps) {
     super(scope, id, props);
 
@@ -112,16 +115,19 @@ export class WebSocketStack extends Stack {
       autoDeploy: true,
     });
 
+    const manageConnectionsArn = `arn:aws:execute-api:${this.region}:${this.account}:${wsApi.apiId}/${stage.stageName}/POST/@connections/*`;
+
     // Allow the handler to push messages back to connected clients
     wsHandlerLambda.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         actions: ["execute-api:ManageConnections"],
-        resources: [
-          `arn:aws:execute-api:${this.region}:${this.account}:${wsApi.apiId}/${stage.stageName}/POST/@connections/*`,
-        ],
+        resources: [manageConnectionsArn],
       }),
     );
+
+    this.callbackUrl = stage.callbackUrl;
+    this.manageConnectionsArn = manageConnectionsArn;
 
     //////////// Outputs ////////////
 

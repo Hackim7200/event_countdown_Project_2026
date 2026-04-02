@@ -1,4 +1,5 @@
 import { App } from "aws-cdk-lib";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { DataStack } from "./stacks/DataStack";
 import { LambdaStack } from "./stacks/LambdaStack";
 import { ApiStack } from "./stacks/ApiStack";
@@ -37,6 +38,7 @@ const dataStack = new DataStack(app, `${appName}-DataStack`, {
 const lambdaStack = new LambdaStack(app, `${appName}-LambdaStack`, {
   env: euWestEnv,
   userItemsTable: dataStack.userItemsTable,
+  connectionsTable: dataStack.websocketConnectionsTable,
 });
 
 const authStack = new AuthStack(app, `${appName}-AuthStack`, {
@@ -60,6 +62,19 @@ const webSocketStack = new WebSocketStack(app, `${appName}-WebSocketStack`, {
   userPool: authStack.userPool,
   userPoolClient: authStack.userPoolClient,
 });
+
+// Grant the Pomodoro Lambda permission to push messages through the WebSocket API
+lambdaStack.pomodorosLambda.addEnvironment(
+  "WEBSOCKET_API_ENDPOINT",
+  webSocketStack.callbackUrl,
+);
+lambdaStack.pomodorosLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ["execute-api:ManageConnections"],
+    resources: [webSocketStack.manageConnectionsArn],
+  }),
+);
 
 // UI stack goes to us-east-1 (required for CloudFront + ACM certificate)
 const uiStack = new UiDeploymentStack(app, `${appName}-UiDeploymentStack`, {
