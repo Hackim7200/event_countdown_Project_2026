@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@aws-amplify/auth": "^6.17.1",
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.1022.0",
     "@aws-sdk/client-cognito-identity": "^3.966.0",
     "@aws-sdk/client-dynamodb": "^3.943.0",
     "@aws-sdk/client-s3": "^3.896.0",
@@ -29,6 +30,7 @@
     "@aws-sdk/util-dynamodb": "^3.946.0",
     "@types/uuid": "^10.0.0",
     "aws-amplify": "^6.15.9",
+    "aws-jwt-verify": "^5.1.1",
     "uuid": "^13.0.0"
   }
 }

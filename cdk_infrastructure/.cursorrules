@@ -1,5 +1,10 @@
 # AWS CDK TypeScript Infrastructure Project Rules
 
+
+#Comment rules
+- Never delete the comments within the project unless you are deleting the file or the functionality for which the comment exists
+
+
 ## Project Structure
 
 This is an AWS CDK infrastructure project with the following structure:

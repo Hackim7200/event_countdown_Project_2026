@@ -111,7 +111,7 @@ function handler(event) {
     });
 
     // CloudFront CDN distribution with custom domain and SSL
-    const distribution = new Distribution(this, "Example2Distribution", {
+    const distribution = new Distribution(this, "SiteDistribution", {
       defaultRootObject: "index.html",
       defaultBehavior: {
         origin: s3Origin,
@@ -143,7 +143,7 @@ function handler(event) {
     });
 
     // Upload the static build files to the S3 bucket and invalidate CloudFront cache
-    new BucketDeployment(this, "Example2Deployment", {
+    new BucketDeployment(this, "SiteBucketDeployment", {
       destinationBucket: deploymentBucket,
       sources: [Source.asset(uiDir)],
       distribution: distribution,

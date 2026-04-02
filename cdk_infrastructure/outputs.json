@@ -1,24 +1,31 @@
 {
-  "CountdownApp-DataStack": {
-    "ExportsOutputRefUserItemsTableA40148DD201ADF08": "UserItemsTable-0a9354e9952f",
-    "ExportsOutputFnGetAttUserItemsTableA40148DDArnA7FA6416": "arn:aws:dynamodb:eu-west-2:759135634975:table/UserItemsTable-0a9354e9952f"
+  "PomodoroPlans-Dev-DataStack": {
+    "ExportsOutputRefUserItemsTableA40148DD201ADF08": "PomodoroPlans-Dev-UserItems",
+    "ExportsOutputRefWebSocketConnectionsTable7F0028CC88CF439E": "PomodoroPlans-Dev-WebSocketConnections",
+    "ExportsOutputFnGetAttWebSocketConnectionsTable7F0028CCArn489CA596": "arn:aws:dynamodb:eu-west-2:759135634975:table/PomodoroPlans-Dev-WebSocketConnections",
+    "ExportsOutputFnGetAttUserItemsTableA40148DDArnA7FA6416": "arn:aws:dynamodb:eu-west-2:759135634975:table/PomodoroPlans-Dev-UserItems"
   },
-  "CountdownApp-AuthStack": {
-    "CountdownIdentityPoolId": "eu-west-2:81e178f1-945f-46d5-a94c-0adb84e89e23",
-    "UserPoolId": "eu-west-2_U0OXGdkaY",
-    "ExportsOutputFnGetAttCountdownUserPoolFB40AE01ArnB155B27F": "arn:aws:cognito-idp:eu-west-2:759135634975:userpool/eu-west-2_U0OXGdkaY",
-    "CountdownUserPoolClientId": "7m3em2vnkscbbncl5b1irjrmkp"
+  "PomodoroPlans-Dev-AuthStack": {
+    "ExportsOutputRefPomodoroPlansDevUserPoolPomodoroPlansDevUserPoolClient63E37CC40109B3C3": "2496ol99l0u1cl90417qredkc2",
+    "UserPoolClientId": "2496ol99l0u1cl90417qredkc2",
+    "UserPoolId": "eu-west-2_z0Re9MH7Y",
+    "ExportsOutputFnGetAttPomodoroPlansDevUserPoolE76880CBArn9A45895D": "arn:aws:cognito-idp:eu-west-2:759135634975:userpool/eu-west-2_z0Re9MH7Y",
+    "IdentityPoolId": "eu-west-2:477a8f38-276f-43a8-8e7c-bb09bf6dea5b",
+    "ExportsOutputRefPomodoroPlansDevUserPoolE76880CB21497686": "eu-west-2_z0Re9MH7Y"
   },
-  "CountdownApp-UiDeploymentStack": {
+  "PomodoroPlans-Dev-UiDeploymentStack": {
     "SiteUrl": "https://arkun.co.uk"
   },
-  "CountdownApp-LambdaStack": {
-    "ExportsOutputFnGetAttProfileLambda07E68A3EArnC67F9DC7": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-ProfileLambda07E68A3E-p7suaSEk3SVq",
-    "ExportsOutputFnGetAttPomodorosLambda3204FBCEArnA1CF40DF": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-PomodorosLambda3204FBCE-8A4fVKK44wM9",
-    "ExportsOutputFnGetAttEventsLambdaE6050439Arn4DABAABB": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-EventsLambdaE6050439-kUDWXd0lQYgQ",
-    "ExportsOutputFnGetAttTodosLambdaD044F98AArn54AE6F97": "arn:aws:lambda:eu-west-2:759135634975:function:CountdownApp-LambdaStack-TodosLambdaD044F98A-zwyvDjAQCRnL"
+  "PomodoroPlans-Dev-LambdaStack": {
+    "ExportsOutputFnGetAttProfileLambda07E68A3EArnC67F9DC7": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStac-ProfileLambda07E68A3E-680LV2iQWHH6",
+    "ExportsOutputFnGetAttPomodorosLambda3204FBCEArnA1CF40DF": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaSt-PomodorosLambda3204FBCE-IxPECgmTgxZl",
+    "ExportsOutputFnGetAttEventsLambdaE6050439Arn4DABAABB": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStack-EventsLambdaE6050439-KGWvbbu89SnF",
+    "ExportsOutputFnGetAttTodosLambdaD044F98AArn54AE6F97": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStack-TodosLambdaD044F98A-h1u5NUpETykz"
   },
-  "CountdownApp-ApiStack": {
-    "CountdownApiEndpoint7FAEED7E": "https://2do4idj139.execute-api.eu-west-2.amazonaws.com/prod/"
+  "PomodoroPlans-Dev-WebSocketStack": {
+    "WebSocketUrl": "wss://6rugea58rk.execute-api.eu-west-2.amazonaws.com/prod"
+  },
+  "PomodoroPlans-Dev-ApiStack": {
+    "CountdownApiEndpoint7FAEED7E": "https://zodi0oj39l.execute-api.eu-west-2.amazonaws.com/prod/"
   }
 }

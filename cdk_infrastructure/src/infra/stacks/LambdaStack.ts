@@ -26,7 +26,7 @@ export class LambdaStack extends Stack {
 
     const table = props.userItemsTable;
 
-    const TodosLambda = new NodejsFunction(this, "TodosLambda", {
+    const todosLambda = new NodejsFunction(this, "TodosLambda", {
       runtime: Runtime.NODEJS_20_X,
       handler: "handler",
       entry: join(
@@ -42,7 +42,7 @@ export class LambdaStack extends Stack {
         TABLE_NAME: table.tableName,
       },
     });
-    TodosLambda.addToRolePolicy(
+    todosLambda.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         resources: [table.tableArn],
@@ -57,11 +57,11 @@ export class LambdaStack extends Stack {
         ],
       }),
     );
-    this.todosLambdaIntegration = new LambdaIntegration(TodosLambda);
+    this.todosLambdaIntegration = new LambdaIntegration(todosLambda);
 
     //////////// Events Lambda ////////////
 
-    const EventsLambda = new NodejsFunction(this, "EventsLambda", {
+    const eventsLambda = new NodejsFunction(this, "EventsLambda", {
       runtime: Runtime.NODEJS_20_X,
       handler: "handler",
       entry: join(
@@ -78,7 +78,7 @@ export class LambdaStack extends Stack {
       },
     });
 
-    EventsLambda.addToRolePolicy(
+    eventsLambda.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         resources: [table.tableArn],
@@ -92,11 +92,11 @@ export class LambdaStack extends Stack {
         ],
       }),
     );
-    this.eventsLambdaIntegration = new LambdaIntegration(EventsLambda);
+    this.eventsLambdaIntegration = new LambdaIntegration(eventsLambda);
 
     //////////// Pomodoros Lambda ////////////
 
-    const PomodorosLambda = new NodejsFunction(this, "PomodorosLambda", {
+    const pomodorosLambda = new NodejsFunction(this, "PomodorosLambda", {
       runtime: Runtime.NODEJS_20_X,
       handler: "handler",
       entry: join(
@@ -112,7 +112,7 @@ export class LambdaStack extends Stack {
         TABLE_NAME: table.tableName,
       },
     });
-    PomodorosLambda.addToRolePolicy(
+    pomodorosLambda.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         resources: [table.tableArn],
@@ -126,11 +126,11 @@ export class LambdaStack extends Stack {
         ],
       }),
     );
-    this.pomodorosLambdaIntegration = new LambdaIntegration(PomodorosLambda);
+    this.pomodorosLambdaIntegration = new LambdaIntegration(pomodorosLambda);
 
     // Profile Lambda
 
-    const ProfileLambda = new NodejsFunction(this, "ProfileLambda", {
+    const profileLambda = new NodejsFunction(this, "ProfileLambda", {
       runtime: Runtime.NODEJS_20_X,
       handler: "handler",
       entry: join(
@@ -146,7 +146,7 @@ export class LambdaStack extends Stack {
         TABLE_NAME: table.tableName,
       },
     });
-    ProfileLambda.addToRolePolicy(
+    profileLambda.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         resources: [table.tableArn],
@@ -161,7 +161,7 @@ export class LambdaStack extends Stack {
         ],
       }),
     );
-    this.profileLambdaIntegration = new LambdaIntegration(ProfileLambda);
+    this.profileLambdaIntegration = new LambdaIntegration(profileLambda);
 
     
 
