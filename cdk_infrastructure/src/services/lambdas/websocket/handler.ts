@@ -124,7 +124,7 @@ async function handleDefault(
     endpoint: `https://${domainName}/${stage}`,
   });
 
-  // Fan out to every connection except the sender, these are id int the dynamo db table
+  // Fan out to every connection except the sender
   const sends = connections
     .map((item) => item.connectionId?.S)
     .filter((id): id is string => !!id && id !== senderConnectionId)

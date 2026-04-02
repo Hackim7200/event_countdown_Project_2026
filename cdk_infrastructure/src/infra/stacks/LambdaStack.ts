@@ -144,7 +144,7 @@ export class LambdaStack extends Stack {
     this.pomodorosLambda = pomodorosLambda;
     this.pomodorosLambdaIntegration = new LambdaIntegration(pomodorosLambda);
 
-    // Profile Lambda
+    //////////// Profile Lambda ////////////
 
     const profileLambda = new NodejsFunction(this, "ProfileLambda", {
       runtime: Runtime.NODEJS_20_X,
@@ -178,8 +178,6 @@ export class LambdaStack extends Stack {
       }),
     );
     this.profileLambdaIntegration = new LambdaIntegration(profileLambda);
-
-    
 
     //////////// Cleanup Old Todos (scheduled) ////////////
 
@@ -217,10 +215,4 @@ export class LambdaStack extends Stack {
       targets: [new LambdaFunction(cleanupLambda)],
     });
   }
-
-
-  
 }
-
-
-

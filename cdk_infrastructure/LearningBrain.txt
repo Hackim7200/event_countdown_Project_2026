@@ -1,0 +1,10 @@
+## WebSocket API (API Gateway v2)
+
+- WebSocket API authorizers MUST return the v1.0 IAM policy response format (principalId + policyDocument + context). The simple v2.0 format ({ isAuthorized: true }) only works for HTTP APIs — using it on a WebSocket API causes a silent HTTP 500 where the handler Lambda is never invoked.
+- The authorizer event type for WebSocket APIs is APIGatewayRequestAuthorizerEvent (v1), not APIGatewayRequestAuthorizerEventV2. The v1 event includes methodArn which is needed for the policy resource.
+- Authorizer context values (e.g. { sub: userId }) are passed to the handler at event.requestContext.authorizer.<key>.
+- When debugging WebSocket connection failures, check CloudWatch logs for BOTH the authorizer and handler Lambdas — if only the authorizer logs appear, the issue is between authorization and handler invocation (e.g. malformed authorizer response).
+- The token is passed via query string (?token=<IdToken>) since WebSocket connections don't support custom headers during the upgrade handshake.
+- dart:io's native WebSocket.connect() is more reliable than web_socket_channel for mobile Flutter apps connecting to API Gateway WebSocket APIs.
+- Explicit port :443 in the wss:// URL avoids Dart's URI parser defaulting to port 0 in error messages.
+- API Gateway returns a connectionId in error responses even when the connection ultimately fails — don't assume a connectionId means the connection succeeded.

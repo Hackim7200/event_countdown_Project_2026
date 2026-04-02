@@ -7,11 +7,8 @@ import { AuthStack } from "./stacks/AuthStack";
 import { UiDeploymentStack } from "./stacks/UiDeploymentStack";
 import { WebSocketStack } from "./stacks/WebSocketStack";
 
-
 const environment = "Dev"; // swap between "Dev" and "Prod" to deploy to the correct environment
 const appName = `PomodoroPlans-${environment}`;
-
-
 
 const app = new App();
 

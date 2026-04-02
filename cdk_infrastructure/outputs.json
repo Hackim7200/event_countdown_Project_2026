@@ -16,14 +16,15 @@
   "PomodoroPlans-Dev-UiDeploymentStack": {
     "SiteUrl": "https://arkun.co.uk"
   },
+  "PomodoroPlans-Dev-WebSocketStack": {
+    "ExportsOutputRefWebsocketApi7F2ABBF22646FC36": "6rugea58rk",
+    "WebSocketUrl": "wss://6rugea58rk.execute-api.eu-west-2.amazonaws.com/prod"
+  },
   "PomodoroPlans-Dev-LambdaStack": {
     "ExportsOutputFnGetAttProfileLambda07E68A3EArnC67F9DC7": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStac-ProfileLambda07E68A3E-680LV2iQWHH6",
     "ExportsOutputFnGetAttPomodorosLambda3204FBCEArnA1CF40DF": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaSt-PomodorosLambda3204FBCE-IxPECgmTgxZl",
     "ExportsOutputFnGetAttEventsLambdaE6050439Arn4DABAABB": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStack-EventsLambdaE6050439-KGWvbbu89SnF",
     "ExportsOutputFnGetAttTodosLambdaD044F98AArn54AE6F97": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStack-TodosLambdaD044F98A-h1u5NUpETykz"
-  },
-  "PomodoroPlans-Dev-WebSocketStack": {
-    "WebSocketUrl": "wss://6rugea58rk.execute-api.eu-west-2.amazonaws.com/prod"
   },
   "PomodoroPlans-Dev-ApiStack": {
     "CountdownApiEndpoint7FAEED7E": "https://zodi0oj39l.execute-api.eu-west-2.amazonaws.com/prod/"

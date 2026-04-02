@@ -34,16 +34,10 @@ export async function postPomodoro(
 
   await ddbClient.send(
     new PutItemCommand({
-      TableName: process.env.TABLE_NAME, // Defined in LambdaStack.ts.
+      TableName: process.env.TABLE_NAME,
       Item: marshall(ddbItem),
     }),
   );
-
-  // Item: {// this is the marshal format which the db understands and it needs to be provided like so
-  //   id: { S: randomId }, // these properties are defined in the DataStack.ts file that is why we are providing it
-  //   title: { S: item.title },
-  //   year: { N: item.year },
-  // },
 
   await notifyUser(
     body.userId,
