@@ -18,6 +18,8 @@ class PomodoroTile extends StatefulWidget {
     required this.pomodoro,
     required this.todoId,
     this.repository,
+    this.isSelected = false,
+    this.onTileTapped,
     this.onCompleted,
     this.onDeleted,
   });
@@ -27,6 +29,13 @@ class PomodoroTile extends StatefulWidget {
 
   /// When null, uses [PomodoroService] (signed-in API).
   final PomodoroRepository? repository;
+
+  /// Whether this tile is the active timer shown in the main display.
+  final bool isSelected;
+
+  /// Called when the tile is tapped. When provided, the parent handles
+  /// start/pause/switching logic instead of this tile.
+  final VoidCallback? onTileTapped;
 
   /// Called after the pomodoro is marked completed in the backend.
   final VoidCallback? onCompleted;
@@ -244,6 +253,10 @@ class _PomodoroTileState extends State<PomodoroTile> {
   }
 
   void _handleTap() {
+    if (widget.onTileTapped != null) {
+      widget.onTileTapped!();
+      return;
+    }
     if (_pomodoro.isCompleted) return;
     if (_pomodoro.isRunning) {
       _handlePause();
@@ -304,6 +317,9 @@ class _PomodoroTileState extends State<PomodoroTile> {
           decoration: BoxDecoration(
             color: scheme.surface,
             borderRadius: BorderRadius.circular(16),
+            border: widget.isSelected
+                ? Border.all(color: scheme.primary, width: 2)
+                : null,
           ),
           child: Row(
             children: [

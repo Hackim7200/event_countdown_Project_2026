@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/features/auth/service/auth_service.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// WebSocket URL from CDK WebSocketStack output.
 const String _webSocketUrl =
-    'wss://6rugea58rk.execute-api.eu-west-2.amazonaws.com/prod';
+    'wss://6rugea58rk.execute-api.eu-west-2.amazonaws.com:443/prod';
 
 /// A generic real-time event pushed from the backend via WebSocket.
 /// Matches the shape sent by [WebSocketNotifier] in CDK lambdas.
@@ -40,7 +40,7 @@ class WebSocketService {
   WebSocketService();
 
   final AuthService _auth = AuthService();
-  WebSocketChannel? _channel;
+  WebSocket? _socket;
   StreamSubscription? _subscription;
   Timer? _reconnectTimer;
   bool _disposed = false;
@@ -53,30 +53,23 @@ class WebSocketService {
 
   /// Opens the WebSocket connection. Safe to call multiple times (no-op if already connected).
   Future<void> connect() async {
-    if (_disposed || _channel != null) return;
+    if (_disposed || _socket != null) return;
 
     final token = await _auth.getIdToken();
-    if (token == null) {
-      safePrint('WebSocket: skipping connect — not signed in');
-      return;
-    }
-
-    final uri = Uri.parse('$_webSocketUrl?token=$token');
+    if (token == null) return;
 
     try {
-      _channel = WebSocketChannel.connect(uri);
-      await _channel!.ready;
+      _socket = await WebSocket.connect('$_webSocketUrl?token=$token');
       _reconnectAttempt = 0;
-      safePrint('WebSocket: connected');
 
-      _subscription = _channel!.stream.listen(
+      _subscription = _socket!.listen(
         _onMessage,
         onError: _onError,
         onDone: _onDone,
       );
     } catch (e) {
       safePrint('WebSocket: connection failed — $e');
-      _channel = null;
+      _socket = null;
       _scheduleReconnect();
     }
   }
@@ -91,13 +84,12 @@ class WebSocketService {
   }
 
   void _onError(Object error) {
-    safePrint('WebSocket: stream error — $error');
+    safePrint('WebSocket error: $error');
     _cleanup();
     _scheduleReconnect();
   }
 
   void _onDone() {
-    safePrint('WebSocket: disconnected');
     _cleanup();
     _scheduleReconnect();
   }
@@ -105,10 +97,7 @@ class WebSocketService {
   void _scheduleReconnect() {
     if (_disposed) return;
     _reconnectAttempt++;
-    final delay = Duration(
-      seconds: _reconnectAttempt.clamp(1, 30),
-    );
-    safePrint('WebSocket: reconnecting in ${delay.inSeconds}s');
+    final delay = Duration(seconds: _reconnectAttempt.clamp(1, 30));
     _reconnectTimer?.cancel();
     _reconnectTimer = Timer(delay, connect);
   }
@@ -116,8 +105,8 @@ class WebSocketService {
   void _cleanup() {
     _subscription?.cancel();
     _subscription = null;
-    _channel?.sink.close().ignore();
-    _channel = null;
+    _socket?.close().ignore();
+    _socket = null;
   }
 
   /// Tears down the connection and all streams permanently.
