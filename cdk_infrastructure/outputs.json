@@ -1,32 +1,32 @@
 {
-  "PomodoroPlans-Dev-DataStack": {
-    "ExportsOutputRefUserItemsTableA40148DD201ADF08": "PomodoroPlans-Dev-UserItems",
-    "ExportsOutputRefWebSocketConnectionsTable7F0028CC88CF439E": "PomodoroPlans-Dev-WebSocketConnections",
-    "ExportsOutputFnGetAttWebSocketConnectionsTable7F0028CCArn489CA596": "arn:aws:dynamodb:eu-west-2:759135634975:table/PomodoroPlans-Dev-WebSocketConnections",
-    "ExportsOutputFnGetAttUserItemsTableA40148DDArnA7FA6416": "arn:aws:dynamodb:eu-west-2:759135634975:table/PomodoroPlans-Dev-UserItems"
+  "PomodoroPlans-Prod-DataStack": {
+    "ExportsOutputRefUserItemsTableA40148DD201ADF08": "PomodoroPlans-Prod-UserItems",
+    "ExportsOutputRefWebSocketConnectionsTable7F0028CC88CF439E": "PomodoroPlans-Prod-WebSocketConnections",
+    "ExportsOutputFnGetAttWebSocketConnectionsTable7F0028CCArn489CA596": "arn:aws:dynamodb:eu-west-2:759135634975:table/PomodoroPlans-Prod-WebSocketConnections",
+    "ExportsOutputFnGetAttUserItemsTableA40148DDArnA7FA6416": "arn:aws:dynamodb:eu-west-2:759135634975:table/PomodoroPlans-Prod-UserItems"
   },
-  "PomodoroPlans-Dev-AuthStack": {
-    "ExportsOutputRefPomodoroPlansDevUserPoolPomodoroPlansDevUserPoolClient63E37CC40109B3C3": "2496ol99l0u1cl90417qredkc2",
-    "UserPoolClientId": "2496ol99l0u1cl90417qredkc2",
-    "UserPoolId": "eu-west-2_z0Re9MH7Y",
-    "ExportsOutputFnGetAttPomodoroPlansDevUserPoolE76880CBArn9A45895D": "arn:aws:cognito-idp:eu-west-2:759135634975:userpool/eu-west-2_z0Re9MH7Y",
-    "IdentityPoolId": "eu-west-2:477a8f38-276f-43a8-8e7c-bb09bf6dea5b",
-    "ExportsOutputRefPomodoroPlansDevUserPoolE76880CB21497686": "eu-west-2_z0Re9MH7Y"
+  "PomodoroPlans-Prod-AuthStack": {
+    "UserPoolClientId": "7k2bj5mc3mih796tsdvn5gua47",
+    "ExportsOutputRefPomodoroPlansProdUserPool3F756FDB1B290042": "eu-west-2_weHNMaBrf",
+    "UserPoolId": "eu-west-2_weHNMaBrf",
+    "IdentityPoolId": "eu-west-2:8571b526-05cf-4a0b-a02c-0dfc1d68f422",
+    "ExportsOutputRefPomodoroPlansProdUserPoolPomodoroPlansProdUserPoolClient45AE5E66F275559B": "7k2bj5mc3mih796tsdvn5gua47",
+    "ExportsOutputFnGetAttPomodoroPlansProdUserPool3F756FDBArnB5304101": "arn:aws:cognito-idp:eu-west-2:759135634975:userpool/eu-west-2_weHNMaBrf"
   },
-  "PomodoroPlans-Dev-UiDeploymentStack": {
+  "PomodoroPlans-Prod-UiDeploymentStack": {
     "SiteUrl": "https://arkun.co.uk"
   },
-  "PomodoroPlans-Dev-WebSocketStack": {
-    "ExportsOutputRefWebsocketApi7F2ABBF22646FC36": "6rugea58rk",
-    "WebSocketUrl": "wss://6rugea58rk.execute-api.eu-west-2.amazonaws.com/prod"
+  "PomodoroPlans-Prod-WebSocketStack": {
+    "ExportsOutputRefWebsocketApi7F2ABBF22646FC36": "xmcg9tn5r3",
+    "WebSocketUrl": "wss://xmcg9tn5r3.execute-api.eu-west-2.amazonaws.com/prod"
   },
-  "PomodoroPlans-Dev-LambdaStack": {
-    "ExportsOutputFnGetAttProfileLambda07E68A3EArnC67F9DC7": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStac-ProfileLambda07E68A3E-680LV2iQWHH6",
-    "ExportsOutputFnGetAttPomodorosLambda3204FBCEArnA1CF40DF": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaSt-PomodorosLambda3204FBCE-IxPECgmTgxZl",
-    "ExportsOutputFnGetAttEventsLambdaE6050439Arn4DABAABB": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStack-EventsLambdaE6050439-KGWvbbu89SnF",
-    "ExportsOutputFnGetAttTodosLambdaD044F98AArn54AE6F97": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Dev-LambdaStack-TodosLambdaD044F98A-h1u5NUpETykz"
+  "PomodoroPlans-Prod-LambdaStack": {
+    "ExportsOutputFnGetAttProfileLambda07E68A3EArnC67F9DC7": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Prod-LambdaSta-ProfileLambda07E68A3E-ifUDLpihmqER",
+    "ExportsOutputFnGetAttPomodorosLambda3204FBCEArnA1CF40DF": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Prod-LambdaS-PomodorosLambda3204FBCE-8UCrPPBLlqJW",
+    "ExportsOutputFnGetAttEventsLambdaE6050439Arn4DABAABB": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Prod-LambdaStac-EventsLambdaE6050439-or7IU4I1eUtK",
+    "ExportsOutputFnGetAttTodosLambdaD044F98AArn54AE6F97": "arn:aws:lambda:eu-west-2:759135634975:function:PomodoroPlans-Prod-LambdaStack-TodosLambdaD044F98A-El2hOMKmKxL1"
   },
-  "PomodoroPlans-Dev-ApiStack": {
-    "CountdownApiEndpoint7FAEED7E": "https://zodi0oj39l.execute-api.eu-west-2.amazonaws.com/prod/"
+  "PomodoroPlans-Prod-ApiStack": {
+    "CountdownApiEndpoint7FAEED7E": "https://yd9av6ydjj.execute-api.eu-west-2.amazonaws.com/prod/"
   }
 }

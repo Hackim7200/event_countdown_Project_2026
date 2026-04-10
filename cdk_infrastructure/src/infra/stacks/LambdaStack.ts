@@ -203,10 +203,7 @@ export class LambdaStack extends Stack {
       new PolicyStatement({
         effect: Effect.ALLOW,
         resources: [table.tableArn],
-        actions: [
-          "dynamodb:Scan",
-          "dynamodb:BatchWriteItem",
-        ],
+        actions: ["dynamodb:Scan", "dynamodb:BatchWriteItem"],
       }),
     );
 

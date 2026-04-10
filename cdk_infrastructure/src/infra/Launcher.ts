@@ -7,7 +7,7 @@ import { AuthStack } from "./stacks/AuthStack";
 import { UiDeploymentStack } from "./stacks/UiDeploymentStack";
 import { WebSocketStack } from "./stacks/WebSocketStack";
 
-const environment = "Dev"; // swap between "Dev" and "Prod" to deploy to the correct environment
+const environment = "Prod"; // swap between "Dev" and "Prod" to deploy to the correct environment
 const appName = `PomodoroPlans-${environment}`;
 
 const app = new App();
@@ -32,6 +32,7 @@ const dataStack = new DataStack(app, `${appName}-DataStack`, {
   env: euWestEnv,
   appName: appName,
 });
+
 const lambdaStack = new LambdaStack(app, `${appName}-LambdaStack`, {
   env: euWestEnv,
   userItemsTable: dataStack.userItemsTable,
@@ -77,3 +78,10 @@ lambdaStack.pomodorosLambda.addToRolePolicy(
 const uiStack = new UiDeploymentStack(app, `${appName}-UiDeploymentStack`, {
   env: usEastEnv,
 }); // { env: usEastEnv } because CloudFront requires ACM certificates in us-east-1
+
+// delete flow:
+//cdk destroy PomodoroPlans-Dev-ApiStack
+// cdk destroy PomodoroPlans-Dev-LambdaStack
+// cdk destroy PomodoroPlans-Dev-WebSocketStack
+// cdk destroy PomodoroPlans-Dev-AuthStack
+// cdk destroy PomodoroPlans-Dev-DataStack

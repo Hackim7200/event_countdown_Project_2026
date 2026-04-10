@@ -6,8 +6,9 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:event_countdown/features/auth/service/auth_service.dart';
 
 /// WebSocket URL from CDK WebSocketStack output.
+/// Updated to match outputs.json [`"WebSocketUrl": "wss://xmcg9tn5r3.execute-api.eu-west-2.amazonaws.com/prod"`]
 const String _webSocketUrl =
-    'wss://6rugea58rk.execute-api.eu-west-2.amazonaws.com:443/prod';
+    'wss://xmcg9tn5r3.execute-api.eu-west-2.amazonaws.com/prod';
 
 /// A generic real-time event pushed from the backend via WebSocket.
 /// Matches the shape sent by [WebSocketNotifier] in CDK lambdas.
@@ -16,11 +17,7 @@ class WsEvent {
   final String action;
   final Map<String, dynamic> data;
 
-  const WsEvent({
-    required this.type,
-    required this.action,
-    required this.data,
-  });
+  const WsEvent({required this.type, required this.action, required this.data});
 
   factory WsEvent.fromJson(Map<String, dynamic> json) {
     return WsEvent(
