@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MONOLITH | Focus</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#fff7f6",
+                        "primary": "#5c5f61",
+                        "on-tertiary-fixed-variant": "#4b5d73",
+                        "on-secondary-fixed": "#3c3f46",
+                        "on-background": "#2b3437",
+                        "outline": "#737c7f",
+                        "secondary-dim": "#50535b",
+                        "secondary": "#5c5f67",
+                        "on-primary-container": "#4f5254",
+                        "tertiary-container": "#d1e4ff",
+                        "on-tertiary": "#f7f9ff",
+                        "tertiary-fixed": "#d1e4ff",
+                        "on-primary-fixed": "#3d4042",
+                        "inverse-surface": "#0c0f10",
+                        "error-dim": "#4e0309",
+                        "surface-dim": "#d1dce0",
+                        "surface-bright": "#f8f9fa",
+                        "primary-dim": "#505355",
+                        "surface-variant": "#dbe4e7",
+                        "secondary-fixed": "#e0e2eb",
+                        "on-tertiary-container": "#415369",
+                        "surface-container-high": "#e3e9ec",
+                        "background": "#f8f9fa",
+                        "on-primary": "#f6f8fa",
+                        "primary-fixed-dim": "#d3d4d7",
+                        "tertiary-fixed-dim": "#c3d6f1",
+                        "on-primary-fixed-variant": "#595c5e",
+                        "secondary-container": "#e0e2eb",
+                        "inverse-primary": "#fbfcff",
+                        "on-secondary-fixed-variant": "#585b63",
+                        "surface-container-low": "#f1f4f6",
+                        "primary-fixed": "#e1e3e5",
+                        "error": "#9f403d",
+                        "surface-tint": "#5c5f61",
+                        "on-secondary": "#f8f8ff",
+                        "primary-container": "#e1e3e5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#9b9d9e",
+                        "outline-variant": "#abb3b7",
+                        "on-tertiary-fixed": "#2f4156",
+                        "on-error-container": "#752121",
+                        "surface-container": "#eaeff1",
+                        "on-surface-variant": "#586064",
+                        "on-surface": "#2b3437",
+                        "tertiary-dim": "#42546b",
+                        "secondary-fixed-dim": "#d2d4dd",
+                        "surface": "#f8f9fa",
+                        "surface-container-highest": "#dbe4e7",
+                        "on-secondary-container": "#4e5259",
+                        "tertiary": "#4e6077",
+                        "error-container": "#fe8983"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .timer-font { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar from JSON -->
+<header class="bg-[#f8f9fa] dark:bg-slate-950 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="close up professional portrait of a person with focused expression against a neutral gray architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYwVm0BEZRVDdaOoHQNqi_s_dlMzZHpkc-hsnEyQMifMkBI8lD2uWHV0AzZrwnRh34DtHSKVYDqypDHKiWb08DxuxjrO2Yhkd3USSxtDvxO9oGLZFajj1lfUtRics16MPU-YjJ8sF8eTZn03FSBv-G6uQ4-e8-HICU3AtoW1BLClfPHBvQ5p11sx4hRUR0NyB9pLkMxuX-TKRizSn2DcvdziCjOL7gW96axeQcnwP5ZTIF9vi_4LWVGfIEShMHiyklhmNyLmfoZOk"/>
+</div>
+<span class="font-['Manrope'] font-black tracking-tighter text-2xl text-[#1A1C1E] dark:text-white">MONOLITH</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#5c5f61] dark:text-slate-400 hover:opacity-80 transition-opacity">settings</button>
+</div>
+</header>
+<main class="flex-grow pt-24 pb-32 px-6">
+<!-- Momentum Header: Timer Section -->
+<section class="flex flex-col items-center mb-16">
+<div class="relative group">
+<h1 class="timer-font text-[5rem] md:text-[8rem] font-extrabold tracking-tight text-on-surface leading-none mb-8">
+                    25:00
+                </h1>
+<!-- Progress Pills -->
+<div class="flex gap-2 justify-center mb-12">
+<div class="h-1.5 w-12 rounded-full bg-primary"></div>
+<div class="h-1.5 w-12 rounded-full bg-primary-container"></div>
+<div class="h-1.5 w-12 rounded-full bg-outline-variant/30"></div>
+<div class="h-1.5 w-12 rounded-full bg-outline-variant/30"></div>
+</div>
+</div>
+<!-- Timer Controls -->
+<div class="flex flex-col w-full gap-4 max-w-xs">
+<button class="bg-primary text-on-primary py-5 rounded-xl font-bold tracking-widest uppercase text-sm shadow-xl active:scale-[0.98] transition-transform">
+                    Start Session
+                </button>
+<button class="bg-surface-container-low text-primary py-4 rounded-xl font-medium tracking-widest uppercase text-xs active:scale-[0.98] transition-transform">
+                    Reset
+                </button>
+</div>
+</section>
+<!-- Execution Steps: Task List -->
+<section class="max-w-xl mx-auto">
+<div class="flex justify-between items-end mb-8">
+<h2 class="font-headline font-extrabold text-2xl tracking-tight uppercase">Execution</h2>
+<span class="font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/60">Step 02/04</span>
+</div>
+<div class="space-y-4">
+<!-- Completed Task -->
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center gap-6 group transition-all duration-300">
+<div class="w-10 h-10 flex items-center justify-center bg-primary rounded-full shrink-0">
+<span class="material-symbols-outlined text-white text-xl">check</span>
+</div>
+<div class="flex-grow">
+<p class="font-label text-sm text-on-surface-variant line-through opacity-60">Architectural wireframing</p>
+</div>
+</div>
+<!-- Current Task -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex items-center gap-6 border-l-4 border-primary shadow-[0_4px_20px_rgba(43,52,55,0.04)]">
+<div class="w-10 h-10 flex items-center justify-center border-2 border-primary rounded-full shrink-0">
+<span class="w-3 h-3 bg-primary rounded-full"></span>
+</div>
+<div class="flex-grow">
+<p class="font-label text-base font-semibold text-on-surface">Core UI Development</p>
+<span class="font-label text-[10px] tracking-widest text-primary font-bold uppercase mt-1 block">In Progress</span>
+</div>
+<span class="material-symbols-outlined text-primary">more_vert</span>
+</div>
+<!-- Pending Task -->
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center gap-6 opacity-60">
+<div class="w-10 h-10 flex items-center justify-center border-2 border-outline-variant rounded-full shrink-0"></div>
+<div class="flex-grow">
+<p class="font-label text-sm text-on-surface-variant">Design System Documentation</p>
+</div>
+</div>
+<!-- Pending Task -->
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center gap-6 opacity-60">
+<div class="w-10 h-10 flex items-center justify-center border-2 border-outline-variant rounded-full shrink-0"></div>
+<div class="flex-grow">
+<p class="font-label text-sm text-on-surface-variant">Stakeholder Review</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB Contextual Suppression Check: Enabled for Dashboard/Timer view -->
+<div class="fixed bottom-28 right-6 z-40">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-[0_20px_40px_rgba(43,52,55,0.15)] bg-primary/90 backdrop-blur-xl active:scale-90 transition-all">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+<!-- BottomNavBar from JSON -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-8 pb-8 pt-4 bg-[#f8f9fa]/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_-20px_40px_rgba(43,52,55,0.04)]">
+<!-- TODOS Tab -->
+<a class="flex flex-col items-center justify-center text-[#5c5f61]/50 dark:text-slate-500 hover:text-[#1A1C1E] dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">check_circle</span>
+<span class="font-['Inter'] font-medium text-[10px] tracking-widest uppercase">TODOS</span>
+</a>
+<!-- EVENTS Tab (Active state semantic mapping for current timer screen) -->
+<a class="flex flex-col items-center justify-center text-[#1A1C1E] dark:text-white font-bold relative after:content-[''] after:absolute after:-bottom-2 after:w-1 after:h-1 after:bg-current after:rounded-full scale-95 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+<span class="font-['Inter'] font-medium text-[10px] tracking-widest uppercase">EVENTS</span>
+</a>
+</nav>
+<!-- Content Separation Tonal Shift -->
+<div class="fixed top-0 left-0 w-full h-24 bg-gradient-to-b from-background to-transparent pointer-events-none z-40"></div>
+<div class="fixed bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent pointer-events-none z-40"></div>
+</body></html>

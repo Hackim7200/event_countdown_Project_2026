@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;700;800&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#fff7f6",
+                    "primary": "#5c5f61",
+                    "on-tertiary-fixed-variant": "#4b5d73",
+                    "on-secondary-fixed": "#3c3f46",
+                    "on-background": "#2b3437",
+                    "outline": "#737c7f",
+                    "secondary-dim": "#50535b",
+                    "secondary": "#5c5f67",
+                    "on-primary-container": "#4f5254",
+                    "tertiary-container": "#d1e4ff",
+                    "on-tertiary": "#f7f9ff",
+                    "tertiary-fixed": "#d1e4ff",
+                    "on-primary-fixed": "#3d4042",
+                    "inverse-surface": "#0c0f10",
+                    "error-dim": "#4e0309",
+                    "surface-dim": "#d1dce0",
+                    "surface-bright": "#f8f9fa",
+                    "primary-dim": "#505355",
+                    "surface-variant": "#dbe4e7",
+                    "secondary-fixed": "#e0e2eb",
+                    "on-tertiary-container": "#415369",
+                    "surface-container-high": "#e3e9ec",
+                    "background": "#f8f9fa",
+                    "on-primary": "#f6f8fa",
+                    "primary-fixed-dim": "#d3d4d7",
+                    "tertiary-fixed-dim": "#c3d6f1",
+                    "on-primary-fixed-variant": "#595c5e",
+                    "secondary-container": "#e0e2eb",
+                    "inverse-primary": "#fbfcff",
+                    "on-secondary-fixed-variant": "#585b63",
+                    "surface-container-low": "#f1f4f6",
+                    "primary-fixed": "#e1e3e5",
+                    "error": "#9f403d",
+                    "surface-tint": "#5c5f61",
+                    "on-secondary": "#f8f8ff",
+                    "primary-container": "#e1e3e5",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#9b9d9e",
+                    "outline-variant": "#abb3b7",
+                    "on-tertiary-fixed": "#2f4156",
+                    "on-error-container": "#752121",
+                    "surface-container": "#eaeff1",
+                    "on-surface-variant": "#586064",
+                    "on-surface": "#2b3437",
+                    "tertiary-dim": "#42546b",
+                    "secondary-fixed-dim": "#d2d4dd",
+                    "surface": "#f8f9fa",
+                    "surface-container-highest": "#dbe4e7",
+                    "on-secondary-container": "#4e5259",
+                    "tertiary": "#4e6077",
+                    "error-container": "#fe8983"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32 selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-[#f8f9fa] dark:bg-slate-950 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-40">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="Modern minimalist studio portrait of a young man with a neutral expression and soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC8iw-ezL3xICVjmaJsXp0tD8plDqw9DIVfsOhUL5cVl1hWLyUEW9NgcMDwNe1IHR8H0-Tvw2umtcUvrW7lnqzVzFKsEzMEfPT8PHaNp2XsU-Ib1S1OwUa_BTJUqw-PxFManMFzn6JWAhwGAoWE-2g_tCNZKilbFVX5QrqYmImNNwnlMmKUFuTaJLgywWUBFb28x-lWPlgI2FAmPqIbMklRYgWCNZ2Y3x5r0EB9ZgCvS0kDkEkS7ONndIwpX7yo8rMMlCDdPHtd-c"/>
+</div>
+<span class="font-['Manrope'] font-black tracking-tighter text-2xl text-[#1A1C1E] dark:text-white uppercase">MONOLITH</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#5c5f61] dark:text-slate-400 hover:opacity-80 transition-opacity cursor-pointer">settings</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-6 max-w-lg mx-auto">
+<!-- Header & Toggle -->
+<section class="mb-16 flex justify-between items-baseline">
+<h1 class="text-5xl font-headline font-extrabold tracking-tight text-on-background">Today</h1>
+<div class="flex items-center gap-6">
+<button class="text-[#1A1C1E] dark:text-white border-b-2 border-[#5c5f61] pb-1 text-sm font-label font-bold uppercase tracking-widest">Today</button>
+<button class="text-[#5c5f61]/60 dark:text-slate-500 pb-1 text-sm font-label font-medium uppercase tracking-widest hover:opacity-80 transition-opacity">Tomorrow</button>
+</div>
+</section>
+<!-- Morning Section -->
+<section class="mb-12">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-headline font-bold text-xs uppercase tracking-[0.2em] text-outline">Morning</h2>
+<div class="h-px bg-surface-container-high flex-grow ml-4"></div>
+</div>
+<div class="space-y-4">
+<!-- Task Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg transition-all active:scale-[0.98]">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-headline font-bold text-on-surface leading-tight">Deep Work: Architecture Blueprint</h3>
+<span class="text-[10px] font-label font-bold tracking-widest text-primary uppercase bg-primary-container px-2 py-1 rounded">Focus</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-label text-on-surface-variant tracking-wider">08:00 — 11:00</span>
+<div class="flex gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Late Afternoon Section -->
+<section class="mb-12">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-headline font-bold text-xs uppercase tracking-[0.2em] text-outline">Late Afternoon</h2>
+<div class="h-px bg-surface-container-high flex-grow ml-4"></div>
+</div>
+<div class="space-y-4">
+<!-- Task Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg transition-all active:scale-[0.98]">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-headline font-bold text-on-surface leading-tight">Client Review: Structural Ethics</h3>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-label text-on-surface-variant tracking-wider">14:30 — 16:00</span>
+<div class="flex gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+</div>
+</div>
+<!-- Task Card 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg transition-all active:scale-[0.98]">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-headline font-bold text-on-surface leading-tight">Material Research</h3>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-label text-on-surface-variant tracking-wider">16:30 — 17:30</span>
+<div class="flex gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Night Section -->
+<section class="mb-12">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-headline font-bold text-xs uppercase tracking-[0.2em] text-outline">Night</h2>
+<div class="h-px bg-surface-container-high flex-grow ml-4"></div>
+</div>
+<div class="space-y-4">
+<!-- Task Card 4 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg transition-all active:scale-[0.98]">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-headline font-bold text-on-surface leading-tight">Journaling &amp; Plan</h3>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-label text-on-surface-variant tracking-wider">21:00 — 21:30</span>
+<div class="flex gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-28 right-6 w-14 h-14 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-[0_20px_40px_rgba(43,52,55,0.2)] active:scale-90 transition-all z-40 bg-gradient-to-br from-primary to-primary-dim">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-8 pb-8 pt-4 bg-[#f8f9fa]/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_-20px_40px_rgba(43,52,55,0.04)]">
+<button class="flex flex-col items-center justify-center text-[#1A1C1E] dark:text-white font-bold relative after:content-[''] after:absolute after:-bottom-2 after:w-1 after:h-1 after:bg-current after:rounded-full scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-['Inter'] font-medium text-[10px] tracking-widest uppercase mt-1">TODOS</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#5c5f61]/50 dark:text-slate-500 hover:text-[#1A1C1E] dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-['Inter'] font-medium text-[10px] tracking-widest uppercase mt-1">EVENTS</span>
+</button>
+</nav>
+</body></html>
