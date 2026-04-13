@@ -63,10 +63,7 @@ class _TomorrowSectionState extends State<TomorrowSection> {
       _salahTimes = results[1] as List<double>;
 
       if (mounted) {
-        final morning = FilterByPeriod.filterByPeriod(
-          tomorrowTodos,
-          'Morning',
-        );
+        final morning = FilterByPeriod.filterByPeriod(tomorrowTodos, 'Morning');
         final early = FilterByPeriod.filterByPeriod(
           tomorrowTodos,
           'Early Afternoon',

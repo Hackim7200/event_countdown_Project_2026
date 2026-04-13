@@ -34,6 +34,8 @@ export interface Task {
   description?: string;
   executionSteps?: ExecutionStep[];
   plannedBlocks?: PlannedBlock[];
+  /** `YYYY-MM-DD` from the API — required for server delete/update parity with mobile. */
+  serverRawDate?: string;
 }
 
 export interface TimeCategoryMeta {

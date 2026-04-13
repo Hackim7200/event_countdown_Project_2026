@@ -5,9 +5,11 @@ import { EventListIcon } from "./event-list-icon";
 export function EventRowCard({
   event,
   countdownMode,
+  onDelete,
 }: {
   event: EventListItem;
   countdownMode: "until" | "since";
+  onDelete?: () => void;
 }) {
   return (
     <article
@@ -41,8 +43,19 @@ export function EventRowCard({
         </div>
       </div>
 
-      <div className="shrink-0 pl-2 text-right">
-        <EventCountdown isoDate={event.date} mode={countdownMode} alignEnd />
+      <div className="flex shrink-0 items-center gap-3 pl-2">
+        {onDelete ? (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="rounded-md px-2 py-1 text-[12px] font-semibold text-red-700 transition-colors hover:bg-red-50"
+          >
+            Delete
+          </button>
+        ) : null}
+        <div className="text-right">
+          <EventCountdown isoDate={event.date} mode={countdownMode} alignEnd />
+        </div>
       </div>
     </article>
   );

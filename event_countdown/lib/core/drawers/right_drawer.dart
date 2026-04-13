@@ -66,7 +66,9 @@ class RightDrawer extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 36,
-                        backgroundColor: scheme.onPrimary.withValues(alpha: 0.2),
+                        backgroundColor: scheme.onPrimary.withValues(
+                          alpha: 0.2,
+                        ),
                         child: Icon(
                           Icons.person,
                           size: 36,
@@ -98,9 +100,14 @@ class RightDrawer extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.manage_accounts_outlined),
                   title: const Text('Delete profile'),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DeleteProfile())),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DeleteProfile(),
+                    ),
+                  ),
                 ),
-              
+
                 const Spacer(),
                 const Divider(height: 1),
                 ListTile(

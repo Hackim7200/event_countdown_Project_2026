@@ -45,9 +45,7 @@ class EventCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: scheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: scheme.outline.withValues(alpha: 0.22),
-              ),
+              border: Border.all(color: scheme.outline.withValues(alpha: 0.22)),
               boxShadow: [
                 BoxShadow(
                   color: scheme.shadow.withValues(alpha: 0.07),

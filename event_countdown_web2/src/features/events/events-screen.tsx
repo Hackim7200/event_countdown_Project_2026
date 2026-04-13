@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { AppHeader } from "@/src/features/todo/components/app-header";
+import { useCallback, useEffect, useState } from "react";
 import {
-  futureEvents,
-  pastEvents,
-} from "@/src/features/events/data/mock-events";
-import type { EventsTimeframe } from "@/src/features/events/types";
+  deleteCountdownEvent,
+  fetchCountdownEvents,
+} from "@/src/app/services/EventService";
+import { AddEventModal } from "@/src/features/events/components/add-event-modal";
 import { EventRowCard } from "@/src/features/events/components/event-row-card";
+import { countdownEventToListItem } from "@/src/features/events/map-countdown-event";
+import type { EventListItem, EventsTimeframe } from "@/src/features/events/types";
+import { AppHeader } from "@/src/features/todo/components/app-header";
 import "@/src/features/events/styles/events.css";
 
 const copy: Record<
@@ -18,19 +20,44 @@ const copy: Record<
     kicker: "History log",
     title: "Past Events",
     description:
-      "A retrospective of concluded milestones and collaborative sessions within the Obsidian ecosystem.",
+      "Concluded milestones loaded from the same Countdown API as the mobile app.",
   },
   future: {
     kicker: "Planning horizon",
     title: "Future Events",
     description:
-      "Scheduled milestones, reviews, and sessions still ahead on the project timeline.",
+      "Upcoming dates from your account, kept in sync with Event Countdown on iOS and Android.",
   },
 };
 
 export function EventsScreen() {
   const [timeframe, setTimeframe] = useState<EventsTimeframe>("past");
-  const events = timeframe === "past" ? pastEvents : futureEvents;
+  const [events, setEvents] = useState<EventListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+
+  const load = useCallback(async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const fp = timeframe === "past" ? "past" : "future";
+      const rows = await fetchCountdownEvents(fp);
+      setEvents(rows.map(countdownEventToListItem));
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Could not load events from the server.",
+      );
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [timeframe]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
   const c = copy[timeframe];
 
   return (
@@ -54,42 +81,64 @@ export function EventsScreen() {
               </p>
             </div>
             <div
-              className="flex gap-8 md:items-center"
+              className="flex flex-wrap items-center gap-6 md:items-center"
               role="tablist"
               aria-label="Event timeframe"
             >
+              <div className="flex gap-8">
+                <button
+                  type="button"
+                  role="tab"
+                  id="tab-past"
+                  aria-selected={timeframe === "past"}
+                  aria-controls="events-panel"
+                  onClick={() => setTimeframe("past")}
+                  className={`relative pb-1 text-[13px] font-semibold tracking-wide transition-colors duration-200 ${
+                    timeframe === "past"
+                      ? "text-[#1A1A1A] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[3px] after:rounded-full after:bg-[#1A1A1A]"
+                      : "text-[#A0A0A0] hover:text-[#6B7280]"
+                  }`}
+                >
+                  Past
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  id="tab-future"
+                  aria-selected={timeframe === "future"}
+                  aria-controls="events-panel"
+                  onClick={() => setTimeframe("future")}
+                  className={`relative pb-1 text-[13px] font-semibold tracking-wide transition-colors duration-200 ${
+                    timeframe === "future"
+                      ? "text-[#1A1A1A] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[3px] after:rounded-full after:bg-[#1A1A1A]"
+                      : "text-[#A0A0A0] hover:text-[#6B7280]"
+                  }`}
+                >
+                  Future
+                </button>
+              </div>
               <button
                 type="button"
-                role="tab"
-                id="tab-past"
-                aria-selected={timeframe === "past"}
-                aria-controls="events-panel"
-                onClick={() => setTimeframe("past")}
-                className={`relative pb-1 text-[13px] font-semibold tracking-wide transition-colors duration-200 ${
-                  timeframe === "past"
-                    ? "text-[#1A1A1A] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[3px] after:rounded-full after:bg-[#1A1A1A]"
-                    : "text-[#A0A0A0] hover:text-[#6B7280]"
-                }`}
+                onClick={() => setAddOpen(true)}
+                className="rounded-lg bg-[#4A5568] px-4 py-2 text-[13px] font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
               >
-                Past
-              </button>
-              <button
-                type="button"
-                role="tab"
-                id="tab-future"
-                aria-selected={timeframe === "future"}
-                aria-controls="events-panel"
-                onClick={() => setTimeframe("future")}
-                className={`relative pb-1 text-[13px] font-semibold tracking-wide transition-colors duration-200 ${
-                  timeframe === "future"
-                    ? "text-[#1A1A1A] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[3px] after:rounded-full after:bg-[#1A1A1A]"
-                    : "text-[#A0A0A0] hover:text-[#6B7280]"
-                }`}
-              >
-                Future
+                Add event
               </button>
             </div>
           </div>
+
+          {error ? (
+            <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <p>{error}</p>
+              <button
+                type="button"
+                onClick={() => void load()}
+                className="mt-2 text-sm font-semibold text-amber-900 underline"
+              >
+                Try again
+              </button>
+            </div>
+          ) : null}
 
           <div
             id="events-panel"
@@ -97,16 +146,36 @@ export function EventsScreen() {
             aria-labelledby={timeframe === "past" ? "tab-past" : "tab-future"}
             className="mt-10 flex flex-col gap-4 md:mt-12 md:gap-5"
           >
-            {events.map((event) => (
-              <EventRowCard
-                key={event.id}
-                event={event}
-                countdownMode={timeframe === "future" ? "until" : "since"}
-              />
-            ))}
+            {loading ? (
+              <p className="text-[15px] text-[#6B7280]">Loading events…</p>
+            ) : events.length === 0 ? (
+              <p className="text-[15px] text-[#6B7280]">
+                No events in this tab yet.
+              </p>
+            ) : (
+              events.map((event) => (
+                <EventRowCard
+                  key={event.id}
+                  event={event}
+                  countdownMode={timeframe === "future" ? "until" : "since"}
+                  onDelete={() => {
+                    void (async () => {
+                      const ok = await deleteCountdownEvent(event.id);
+                      if (ok) void load();
+                    })();
+                  }}
+                />
+              ))
+            )}
           </div>
         </div>
       </main>
+
+      <AddEventModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onCreated={() => void load()}
+      />
     </div>
   );
 }

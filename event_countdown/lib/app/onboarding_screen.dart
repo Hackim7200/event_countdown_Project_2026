@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 /// Shown before the Amplify sign-in UI until the user taps through.

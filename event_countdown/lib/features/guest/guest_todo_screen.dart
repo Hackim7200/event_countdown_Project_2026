@@ -249,6 +249,7 @@ class _GuestTodoScreenState extends State<GuestTodoScreen> {
               return TodoCard(
                 key: ValueKey(g.id),
                 pomodoroCount: g.pomodoroCount,
+                completedPomodoros: g.completedPomodoroCount,
                 onDelete: () => _confirmDeleteTodo(g),
                 todo: todo,
                 onTap: () => _openPomodoro(g),

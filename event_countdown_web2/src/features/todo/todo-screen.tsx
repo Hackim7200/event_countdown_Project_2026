@@ -10,7 +10,7 @@ import { TomorrowSequenceGrid } from "@/src/features/tomorrow/components/tomorro
 import "@/src/features/todo/styles/todo.css";
 
 export function TodoScreen() {
-  const { tasks, addTask } = useTodo();
+  const { tasks, addTask, isLoading, error, refreshTasks } = useTodo();
   const [tab, setTab] = useState<DayTab>("today");
   const [addOpen, setAddOpen] = useState(false);
 
@@ -54,8 +54,23 @@ export function TodoScreen() {
             </div>
           </div>
 
+          {error ? (
+            <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <p>{error}</p>
+              <button
+                type="button"
+                onClick={() => void refreshTasks()}
+                className="mt-2 text-sm font-semibold text-amber-900 underline"
+              >
+                Try again
+              </button>
+            </div>
+          ) : null}
+
           <div className="tsa-tab-panel mt-10 md:mt-12">
-            {tab === "today" ? (
+            {isLoading ? (
+              <p className="text-[15px] text-[#6B7280]">Loading tasks…</p>
+            ) : tab === "today" ? (
               <SequenceGrid day="today" tasks={tasks} />
             ) : (
               <TomorrowSequenceGrid tasks={tasks} />

@@ -1,9 +1,14 @@
 import Link from "next/link";
 
-export function Hero() {
+type HeroProps = {
+  /** When false, hide the product line (e.g. when parent `AppShell` already shows it). */
+  showEyebrow?: boolean;
+};
+
+export function Hero({ showEyebrow = true }: HeroProps) {
   return (
     <section
-      className="relative overflow-hidden border-b border-[#E8EAED] bg-linear-to-b from-[#FAFAF9] to-white"
+      className="relative overflow-hidden rounded-lg border border-[#E8EAED] bg-linear-to-b from-[#FAFAF9] to-white shadow-sm"
       aria-labelledby="hero-heading"
     >
       <div
@@ -17,12 +22,14 @@ export function Hero() {
 
       <div className="relative mx-auto flex max-w-[1200px] flex-col gap-10 px-4 py-16 md:gap-12 md:px-8 md:py-24 lg:py-28">
         <div className="max-w-2xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7280] md:text-[12px]">
-            The Silent Architect
-          </p>
+          {showEyebrow && (
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7280] md:text-[12px]">
+              The Silent Architect
+            </p>
+          )}
           <h1
             id="hero-heading"
-            className="mt-4 text-balance text-3xl font-semibold tracking-tight text-[#1A1A1A] md:text-4xl lg:text-[2.75rem] lg:leading-[1.1]"
+            className={`text-balance text-3xl font-semibold tracking-tight text-[#1A1A1A] md:text-4xl lg:text-[2.75rem] lg:leading-[1.1] ${showEyebrow ? "mt-4" : "mt-0"}`}
           >
             Structure your day. Ship the work that matters.
           </h1>

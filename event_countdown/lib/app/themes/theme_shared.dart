@@ -38,7 +38,10 @@ InputDecorationTheme _inputDecorationTheme({
   );
 }
 
-ButtonStyle _elevatedButtonStyle({required Color background, required Color foreground}) {
+ButtonStyle _elevatedButtonStyle({
+  required Color background,
+  required Color foreground,
+}) {
   return ElevatedButton.styleFrom(
     backgroundColor: background,
     foregroundColor: foreground,

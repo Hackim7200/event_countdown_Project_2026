@@ -1,9 +1,10 @@
 import { Hero } from "@/src/features/landing/components/hero";
+import { AppShell } from "@/src/shared/components/app-shell";
 
 export function LandingScreen() {
   return (
-    <main className="min-h-0 flex-1">
-      <Hero />
-    </main>
+    <AppShell layout="wide">
+      <Hero showEyebrow={false} />
+    </AppShell>
   );
 }

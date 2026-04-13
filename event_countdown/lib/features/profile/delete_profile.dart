@@ -46,7 +46,8 @@ class _DeleteProfileState extends State<DeleteProfile> {
 
     setState(() => _isDeleting = true);
     try {
-      final dataRemoved = await _profileService.deleteAllAppDataForCurrentUser();
+      final dataRemoved = await _profileService
+          .deleteAllAppDataForCurrentUser();
       if (!mounted) return;
       if (!dataRemoved) {
         ScaffoldMessenger.of(context).showSnackBar(

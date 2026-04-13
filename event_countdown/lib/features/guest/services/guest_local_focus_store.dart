@@ -11,11 +11,13 @@ class GuestTodoSummary {
     required this.id,
     required this.title,
     this.pomodoroCount = 0,
+    this.completedPomodoroCount = 0,
   });
 
   final String id;
   final String title;
   final int pomodoroCount;
+  final int completedPomodoroCount;
 }
 
 class _GuestTodoRecord {
@@ -115,6 +117,8 @@ class GuestLocalFocusStore implements PomodoroRepository {
             id: t.id,
             title: t.title,
             pomodoroCount: t.pomodoros.length,
+            completedPomodoroCount:
+                t.pomodoros.where((p) => p.isCompleted).length,
           ),
         )
         .toList();
@@ -124,9 +128,7 @@ class GuestLocalFocusStore implements PomodoroRepository {
     await _loadFromPrefs();
     final trimmed = title.trim();
     if (trimmed.isEmpty) return;
-    _todos.add(
-      _GuestTodoRecord(id: _uuid.v4(), title: trimmed, pomodoros: []),
-    );
+    _todos.add(_GuestTodoRecord(id: _uuid.v4(), title: trimmed, pomodoros: []));
     await _persist();
   }
 

@@ -4,93 +4,103 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 import {
-  createInitialTasks,
-  DEFAULT_TODAY_EXECUTION_STEPS,
-  type DayTab,
-  type Task,
-  type TimeCategoryId,
-} from "@/src/features/todo/types";
+  createCountdownTodo,
+  fetchCountdownTodosForDate,
+} from "@/src/app/services/TodoService";
+import { countdownTodoToTask } from "@/src/features/todo/api/map-countdown-todo-to-task";
+import { timeCategoryToApiPeriod } from "@/src/features/todo/api/time-period-map";
+import type { DayTab, Task, TimeCategoryId } from "@/src/features/todo/types";
 
-function newId(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+function startOfLocalDay(base = new Date()): Date {
+  return new Date(base.getFullYear(), base.getMonth(), base.getDate());
 }
 
-function defaultExecutionSteps(): Task["executionSteps"] {
-  return DEFAULT_TODAY_EXECUTION_STEPS.map((s, i) => ({
-    ...s,
-    id: `exec-${newId()}-${i}`,
-  }));
-}
-
-function emptyPlannedBlocks(count: number): Task["plannedBlocks"] {
-  return Array.from({ length: count }, (_, i) => {
-    const n = String(i + 1).padStart(2, "0");
-    return {
-      id: `pb-${newId()}-${i}`,
-      indexLabel: n,
-      title: `Focus block ${n}`,
-      description: "Define the intent for this Pomodoro block.",
-    };
-  });
+function addLocalDays(d: Date, days: number): Date {
+  const x = new Date(d.getTime());
+  x.setDate(x.getDate() + days);
+  return x;
 }
 
 interface TodoContextValue {
   tasks: Task[];
+  isLoading: boolean;
+  error: string | null;
+  refreshTasks: () => Promise<void>;
   addTask: (input: {
     day: DayTab;
     category: TimeCategoryId;
     title: string;
-    totalPomodoros: number;
-  }) => void;
+  }) => Promise<void>;
   getTask: (id: string) => Task | undefined;
 }
 
 const TodoContext = createContext<TodoContextValue | null>(null);
 
 export function TodoProvider({ children }: { children: ReactNode }) {
-  const [tasks, setTasks] = useState<Task[]>(() => createInitialTasks());
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refreshTasks = useCallback(async () => {
+    setError(null);
+    const today0 = startOfLocalDay();
+    const tomorrow0 = addLocalDays(today0, 1);
+    try {
+      const [todayDtos, tomorrowDtos] = await Promise.all([
+        fetchCountdownTodosForDate(today0),
+        fetchCountdownTodosForDate(tomorrow0),
+      ]);
+      setTasks([
+        ...todayDtos.map((d) => countdownTodoToTask(d, "today")),
+        ...tomorrowDtos.map((d) => countdownTodoToTask(d, "tomorrow")),
+      ]);
+    } catch (e) {
+      const msg =
+        e instanceof Error ? e.message : "Could not load tasks from the server.";
+      setError(msg);
+      setTasks([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setIsLoading(true);
+      await refreshTasks();
+      if (!cancelled) setIsLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshTasks]);
 
   const addTask = useCallback(
-    (input: {
+    async (input: {
       day: DayTab;
       category: TimeCategoryId;
       title: string;
-      totalPomodoros: number;
     }) => {
       const trimmed = input.title.trim();
       if (!trimmed) return;
 
-      setTasks((prev) => {
-        const id = newId();
-        const base: Task = {
-          id,
-          title: trimmed,
-          day: input.day,
-          category: input.category,
-          completedPomodoros: 0,
-          totalPomodoros: Math.max(1, input.totalPomodoros),
-        };
+      const dueDate =
+        input.day === "today" ? startOfLocalDay() : addLocalDays(startOfLocalDay(), 1);
 
-        if (input.day === "today") {
-          base.executionSteps = defaultExecutionSteps();
-        } else {
-          base.description =
-            "Outline the objective and constraints for this sequence.";
-          base.plannedBlocks = emptyPlannedBlocks(base.totalPomodoros);
-        }
-
-        return [...prev, base];
+      await createCountdownTodo({
+        title: trimmed,
+        dueDate,
+        timePeriod: timeCategoryToApiPeriod(input.category),
       });
+
+      await refreshTasks();
     },
-    [],
+    [refreshTasks],
   );
 
   const getTask = useCallback(
@@ -99,8 +109,15 @@ export function TodoProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ tasks, addTask, getTask }),
-    [tasks, addTask, getTask],
+    () => ({
+      tasks,
+      isLoading,
+      error,
+      refreshTasks,
+      addTask,
+      getTask,
+    }),
+    [tasks, isLoading, error, refreshTasks, addTask, getTask],
   );
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

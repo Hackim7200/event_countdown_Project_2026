@@ -1,5 +1,5 @@
 // import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-// import { AuthService } from "./AuthService";
+// import { getUserId } from "./AuthService";
 // import { DataStack, ApiStack } from '../../../space-finder/outputs.json';
 // import { SpaceEntry } from "../components/model/model";
 

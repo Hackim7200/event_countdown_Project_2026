@@ -31,7 +31,9 @@ class AuthenticatorLayout extends StatelessWidget {
           const SizedBox(height: 28),
           Text(
             title,
-            style: t.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+            style: t.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -51,10 +53,7 @@ class AuthenticatorLayout extends StatelessWidget {
               child: child,
             ),
           ),
-          if (belowCard != null) ...[
-            const SizedBox(height: 20),
-            belowCard!,
-          ],
+          if (belowCard != null) ...[const SizedBox(height: 20), belowCard!],
           const SizedBox(height: 24),
         ],
       ),
