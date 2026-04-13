@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 
-type NavKey = "todos" | "events";
+/** Primary chrome tab; `home` = landing / legal pages (no TODOS or EVENTS underline). */
+export type AppHeaderActiveNav =
+  | "todos"
+  | "events"
+  | "profile"
+  | "home";
 
 export function AppHeader({
   activeNav,
@@ -10,7 +15,7 @@ export function AppHeader({
   /** Bell, settings, and profile — matches Events toolbar in design. */
   showHeaderActions = false,
 }: {
-  activeNav: NavKey;
+  activeNav: AppHeaderActiveNav;
   showNotifications?: boolean;
   showHeaderActions?: boolean;
 }) {
@@ -79,13 +84,17 @@ export function AppHeader({
               <GearIcon className="h-5 w-5" />
             </button>
           )}
-          <button
-            type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8D5C4] text-[#5C4A3A] transition-transform duration-200 hover:scale-[1.02] md:h-10 md:w-10"
+          <Link
+            href="/profile/"
+            className={`flex h-9 w-9 items-center justify-center rounded-full bg-[#E8D5C4] text-[#5C4A3A] transition-transform duration-200 hover:scale-[1.02] md:h-10 md:w-10 ${
+              activeNav === "profile"
+                ? "ring-2 ring-[#1A1A1A] ring-offset-2 ring-offset-white"
+                : ""
+            }`}
             aria-label="Profile"
           >
             <UserIcon className="h-[18px] w-[18px] md:h-5 md:w-5" />
-          </button>
+          </Link>
         </div>
       </div>
     </header>

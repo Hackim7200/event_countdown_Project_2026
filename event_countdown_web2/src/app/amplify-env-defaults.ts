@@ -9,4 +9,6 @@ export const AMPLIFY_ENV_DEFAULTS = {
   countdownApiEndpoint:
     "https://yd9av6ydjj.execute-api.eu-west-2.amazonaws.com/prod",
   awsRegion: "eu-west-2",
+  /** `PomodoroPlans-Prod-WebSocketStack.WebSocketUrl` — real-time pomodoro sync. */
+  websocketUrl: "wss://xmcg9tn5r3.execute-api.eu-west-2.amazonaws.com/prod",
 } as const;

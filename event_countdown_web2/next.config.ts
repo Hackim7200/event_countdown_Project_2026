@@ -5,6 +5,7 @@ import path from "node:path";
 /** Stack keys in `../cdk_infrastructure/outputs.json` (CDK `cdk deploy` output). */
 const CDK_AUTH_STACK_KEY = "PomodoroPlans-Prod-AuthStack";
 const CDK_API_STACK_KEY = "PomodoroPlans-Prod-ApiStack";
+const CDK_WEBSOCKET_STACK_KEY = "PomodoroPlans-Prod-WebSocketStack";
 
 function regionFromUserPoolId(userPoolId: string): string {
   const idx = userPoolId.indexOf("_");
@@ -66,6 +67,7 @@ function cdkOutputsPublicEnv(): Record<string, string | undefined> {
     const outputs = JSON.parse(raw) as Record<string, Record<string, string>>;
     const auth = outputs[CDK_AUTH_STACK_KEY];
     const api = outputs[CDK_API_STACK_KEY];
+    const wsStack = outputs[CDK_WEBSOCKET_STACK_KEY];
 
     const out: Record<string, string | undefined> = {};
 
@@ -79,6 +81,11 @@ function cdkOutputsPublicEnv(): Record<string, string | undefined> {
     const endpoint = countdownApiEndpoint(api);
     if (endpoint) {
       out.NEXT_PUBLIC_COUNTDOWN_API_ENDPOINT = endpoint;
+    }
+
+    const wsUrl = wsStack?.WebSocketUrl?.trim();
+    if (wsUrl) {
+      out.NEXT_PUBLIC_WEBSOCKET_URL = wsUrl.replace(/\/$/, "");
     }
 
     return out;

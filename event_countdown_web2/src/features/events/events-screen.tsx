@@ -10,6 +10,7 @@ import { EventRowCard } from "@/src/features/events/components/event-row-card";
 import { countdownEventToListItem } from "@/src/features/events/map-countdown-event";
 import type { EventListItem, EventsTimeframe } from "@/src/features/events/types";
 import { AppHeader } from "@/src/features/todo/components/app-header";
+import { DashedAddTile } from "@/src/shared/components/dashed-add-tile";
 import "@/src/features/events/styles/events.css";
 
 const copy: Record<
@@ -117,13 +118,6 @@ export function EventsScreen() {
                   Future
                 </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setAddOpen(true)}
-                className="rounded-lg bg-[#4A5568] px-4 py-2 text-[13px] font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
-              >
-                Add event
-              </button>
             </div>
           </div>
 
@@ -167,6 +161,14 @@ export function EventsScreen() {
                 />
               ))
             )}
+            {!loading ? (
+              <DashedAddTile
+                variant="eventRow"
+                onClick={() => setAddOpen(true)}
+                className="mt-2"
+                ariaLabel="Add new event"
+              />
+            ) : null}
           </div>
         </div>
       </main>

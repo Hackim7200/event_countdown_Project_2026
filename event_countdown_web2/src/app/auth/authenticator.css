@@ -1,0 +1,40 @@
+/* Layout polish around Amplify Authenticator (theme tokens handle colors). */
+
+.tsa-authenticator[data-amplify-authenticator] {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vh, 2rem) 1rem clamp(1.5rem, 5vh, 2.5rem);
+}
+
+/* Cap width: full-width was stretching tabs, fields, and buttons edge-to-edge. */
+.tsa-authenticator [data-amplify-container] {
+  width: min(100%, 22rem);
+  max-width: 22rem;
+  margin-inline: auto;
+  flex-shrink: 0;
+}
+
+.tsa-authenticator [data-amplify-router] {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Match TODOS / EVENTS tab styling in `AppHeader`. */
+.tsa-authenticator [data-amplify-authenticator] [role="tab"] {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .tsa-authenticator [data-amplify-authenticator] [role="tab"] {
+    font-size: 12px;
+  }
+}

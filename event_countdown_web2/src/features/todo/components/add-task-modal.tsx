@@ -10,11 +10,14 @@ import {
 export function AddTaskModal({
   open,
   day,
+  presetCategory = "morning",
   onClose,
   onSubmit,
 }: {
   open: boolean;
   day: DayTab;
+  /** When the sheet opens, time category defaults to this (e.g. Morning vs Afternoon add buttons). */
+  presetCategory?: TimeCategoryId;
   onClose: () => void;
   onSubmit: (input: {
     day: DayTab;
@@ -23,13 +26,15 @@ export function AddTaskModal({
   }) => void | Promise<void>;
 }) {
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<TimeCategoryId>("morning");
+  const [category, setCategory] = useState<TimeCategoryId>(presetCategory);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (open) setFormError(null);
-  }, [open]);
+    if (!open) return;
+    setFormError(null);
+    setCategory(presetCategory);
+  }, [open, presetCategory]);
 
   if (!open) return null;
 
@@ -44,7 +49,7 @@ export function AddTaskModal({
         title,
       });
       setTitle("");
-      setCategory("morning");
+      setCategory(presetCategory);
       onClose();
     } catch (err) {
       setFormError(

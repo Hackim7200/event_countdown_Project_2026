@@ -1,31 +1,42 @@
 import type { ReactNode } from "react";
-import { SiteFooter } from "./site-footer";
-import { SiteNav } from "./site-nav";
+import { AppHeader } from "@/src/features/todo/components/app-header";
+import type { AppHeaderActiveNav } from "@/src/features/todo/components/app-header";
 
 type AppShellProps = {
   children: ReactNode;
-  /** `default` — narrow column; `wide` — same max width as app chrome (e.g. landing hero). */
+  /**
+   * `wide` — full content width up to 1200px (e.g. landing hero).
+   * `default` — centered column max 2xl for readable legal/support copy.
+   */
   layout?: "default" | "wide";
+  activeNav: AppHeaderActiveNav;
+  showHeaderActions?: boolean;
 };
 
-export function AppShell({ children, layout = "default" }: AppShellProps) {
-  const innerMax =
-    layout === "wide" ? "max-w-[1200px]" : "max-w-2xl";
+export function AppShell({
+  children,
+  layout = "default",
+  activeNav,
+  showHeaderActions = true,
+}: AppShellProps) {
+  const inner =
+    layout === "wide" ? (
+      <div className="w-full">{children}</div>
+    ) : (
+      <div className="mx-auto w-full max-w-2xl">{children}</div>
+    );
 
   return (
-    <div className="min-h-full bg-zinc-50 text-zinc-900">
-      <div
-        className={`mx-auto flex min-h-full ${innerMax} flex-col px-6 py-10 sm:px-8 sm:py-14`}
-      >
-        <header className="mb-12">
-          <p className="mb-6 text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-400">
-            The Silent Architect
-          </p>
-          <SiteNav />
-        </header>
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
-      </div>
+    <div className="flex min-h-0 flex-1 flex-col bg-[#F8F9FA]">
+      <AppHeader
+        activeNav={activeNav}
+        showHeaderActions={showHeaderActions}
+      />
+      <main className="relative flex-1">
+        <div className="mx-auto w-full max-w-[1200px] px-4 py-8 pb-28 md:px-8 md:py-10">
+          {inner}
+        </div>
+      </main>
     </div>
   );
 }

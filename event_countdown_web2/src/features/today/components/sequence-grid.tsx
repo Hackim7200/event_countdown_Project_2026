@@ -17,7 +17,15 @@ const COLUMN_GROUPS: TimeCategoryId[][] = [
   ["night"],
 ];
 
-export function SequenceGrid({ day, tasks }: { day: DayTab; tasks: Task[] }) {
+export function SequenceGrid({
+  day,
+  tasks,
+  onAddTask,
+}: {
+  day: DayTab;
+  tasks: Task[];
+  onAddTask?: (category: TimeCategoryId) => void;
+}) {
   const byCategory = useMemo(() => {
     const map = new Map<TimeCategoryId, Task[]>();
     for (const c of TIME_CATEGORIES) {
@@ -43,6 +51,7 @@ export function SequenceGrid({ day, tasks }: { day: DayTab; tasks: Task[] }) {
               key={categoryId}
               categoryId={categoryId}
               tasks={byCategory.get(categoryId) ?? []}
+              onAddTask={onAddTask ? () => onAddTask(categoryId) : undefined}
             />
           ))}
         </div>

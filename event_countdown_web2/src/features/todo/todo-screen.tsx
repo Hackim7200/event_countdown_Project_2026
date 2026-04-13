@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AppHeader } from "@/src/features/todo/components/app-header";
 import { AddTaskModal } from "@/src/features/todo/components/add-task-modal";
 import { useTodo } from "@/src/features/todo/context/todo-context";
-import type { DayTab } from "@/src/features/todo/types";
+import type { DayTab, TimeCategoryId } from "@/src/features/todo/types";
 import { SequenceGrid } from "@/src/features/today/components/sequence-grid";
 import { TomorrowSequenceGrid } from "@/src/features/tomorrow/components/tomorrow-sequence-grid";
 import "@/src/features/todo/styles/todo.css";
@@ -13,6 +13,13 @@ export function TodoScreen() {
   const { tasks, addTask, isLoading, error, refreshTasks } = useTodo();
   const [tab, setTab] = useState<DayTab>("today");
   const [addOpen, setAddOpen] = useState(false);
+  const [addPresetCategory, setAddPresetCategory] =
+    useState<TimeCategoryId>("morning");
+
+  function openAddTask(category: TimeCategoryId) {
+    setAddPresetCategory(category);
+    setAddOpen(true);
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-[#F8F9FA]">
@@ -71,45 +78,28 @@ export function TodoScreen() {
             {isLoading ? (
               <p className="text-[15px] text-[#6B7280]">Loading tasks…</p>
             ) : tab === "today" ? (
-              <SequenceGrid day="today" tasks={tasks} />
+              <SequenceGrid
+                day="today"
+                tasks={tasks}
+                onAddTask={openAddTask}
+              />
             ) : (
-              <TomorrowSequenceGrid tasks={tasks} />
+              <TomorrowSequenceGrid
+                tasks={tasks}
+                onAddTask={openAddTask}
+              />
             )}
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={() => setAddOpen(true)}
-          className="fixed bottom-6 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-lg bg-[#4A5568] text-white shadow-[0_8px_24px_rgba(15,23,42,0.18)] transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] md:bottom-8 md:right-8 md:h-[56px] md:w-[56px]"
-          aria-label="Add task"
-        >
-          <PlusIcon className="h-7 w-7" />
-        </button>
       </main>
 
       <AddTaskModal
         open={addOpen}
         day={tab}
+        presetCategory={addPresetCategory}
         onClose={() => setAddOpen(false)}
         onSubmit={addTask}
       />
     </div>
-  );
-}
-
-function PlusIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      aria-hidden
-    >
-      <path d="M12 5v14M5 12h14" />
-    </svg>
   );
 }

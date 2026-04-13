@@ -7,13 +7,16 @@ import {
 } from "@/src/features/todo/types";
 import { CategoryIcon } from "@/src/features/today/components/category-icon";
 import { TaskCard } from "@/src/features/today/components/task-card";
+import { DashedAddTile } from "@/src/shared/components/dashed-add-tile";
 
 export function TimeCategoryColumn({
   categoryId,
   tasks,
+  onAddTask,
 }: {
   categoryId: TimeCategoryId;
   tasks: Task[];
+  onAddTask?: () => void;
 }) {
   const meta = TIME_CATEGORIES.find((c) => c.id === categoryId);
   if (!meta) return null;
@@ -36,6 +39,13 @@ export function TimeCategoryColumn({
         {tasks.map((task) => (
           <TaskCard key={task.id} task={task} />
         ))}
+        {onAddTask ? (
+          <DashedAddTile
+            variant="taskCard"
+            onClick={onAddTask}
+            ariaLabel={`Add task to ${meta.label}`}
+          />
+        ) : null}
       </div>
     </section>
   );
